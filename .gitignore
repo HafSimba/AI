@@ -1,0 +1,22 @@
+# File temporanei e di debug
+*.tmp
+*.temp
+*-debug.html
+*-test.html
+setup.html
+
+# File di sistema
+Thumbs.db
+.DS_Store
+
+# Log files
+*.log
+
+# Backup files
+*-backup.*
+*-old.*
+*.bak
+
+# Cartelle temporanee
+temp/
+debug/

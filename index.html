@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amico Virtuale AI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar sinistra -->
+        <div class="sidebar">
+            <!-- Avatar Section -->
+            <div class="avatar-section">
+                <div class="avatar-circle" id="avatar">
+                    <div class="face">
+                        <div class="eyes">
+                            <div class="eye left-eye"></div>
+                            <div class="eye right-eye"></div>
+                        </div>
+                        <div class="mouth" id="mouth"></div>
+                    </div>
+                </div>
+                
+                <!-- Status Indicators -->
+                <div class="status-indicators">
+                    <div class="status-item" id="ai-status">
+                        <span class="status-icon">🧠</span>
+                        <span class="status-text">AI: Connesso e pronto</span>
+                    </div>
+                    <div class="status-item" id="memory-status">
+                        <span class="status-icon">🧠</span>
+                        <span class="status-text">Memoria: 0/10 scambi</span>
+                    </div>
+                    <div class="status-item" id="search-status">
+                        <span class="status-icon">🔍</span>
+                        <span class="status-text">Ricerca: Online</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls Section -->
+            <div class="controls-section">
+                <button id="test-ai" class="control-btn">
+                    <span class="btn-icon">🧠</span>
+                    <span class="btn-text">Test AI</span>
+                </button>
+                <button id="test-search" class="control-btn">
+                    <span class="btn-icon">🔍</span>
+                    <span class="btn-text">Test Ricerca</span>
+                </button>
+                <button id="toggle-chat" class="control-btn active">
+                    <span class="btn-icon">💬</span>
+                    <span class="btn-text">Chat Attiva</span>
+                </button>
+                <button id="clear-memory" class="control-btn">
+                    <span class="btn-icon">🗑️</span>
+                    <span class="btn-text">Cancella Memoria</span>
+                </button>
+            </div>
+
+            <!-- Conversazione Vocale Section (nascosta, mantenuta per compatibilità) -->
+            <div class="conversation-section" style="display: none;">
+                <h3>🎤 Conversazione Vocale:</h3>
+                <div id="transcript" class="conversation-log">
+                    <p><em>Log delle conversazioni...</em></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="main-chat">            <div class="chat-header">
+                <h1>CHAT</h1>
+                <div class="mode-indicator" id="mode-indicator">
+                    <span class="mode-icon">🎵</span>
+                    <span class="mode-name">Modalità: Musica</span>
+                </div>
+            </div>
+            
+            <div class="chat-container" id="chat-section">
+                <div class="chat-messages" id="chat-messages">
+                    <div class="chat-message ai-message">
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-content">
+                            <p>Ciao! Scrivi qui il tuo messaggio per iniziare a chattare. Come posso aiutarti?</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quadro Messaggi (area per messaggi suggeriti) -->
+                <div class="message-suggestions">
+                    <h4>QUADRO MESSAGGI</h4>
+                    <div class="suggestion-input">
+                        <input type="text" placeholder="Parla con Bittron" id="chat-input">
+                        <button id="send-message" class="send-btn">
+                            <span class="btn-icon">⚙️</span>
+                            <span class="btn-text">Modalità bittron</span>
+                        </button>
+                    </div>                    <div class="suggestion-tags">
+                        <button class="tag-btn mode-musica active" data-category="musica">🎵 musica</button>
+                        <button class="tag-btn mode-programmatore" data-category="programmatore">💻 Programmatore</button>
+                        <button class="tag-btn mode-ricercatore" data-category="ricercatore">🔬 Ricercatore</button>
+                        <button class="tag-btn mode-amico" data-category="amico">😊 Amico</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

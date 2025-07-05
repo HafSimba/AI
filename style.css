@@ -1,0 +1,1531 @@
+/* Reset e stili base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #1a1a2e;
+    color: #fff;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Container principale */
+.app-container {
+    display: flex;
+    height: 100vh;
+    background: #1a1a2e;
+}
+
+/* SIDEBAR SINISTRA */
+.sidebar {
+    width: 320px;
+    background: #16213e;
+    border-right: 1px solid #2a3f5f;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* Sezione Avatar */
+.avatar-section {
+    padding: 30px 20px;
+    text-align: center;
+    border-bottom: 1px solid #2a3f5f;
+}
+
+.avatar-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    animation: float 6s ease-in-out infinite;
+    transition: background 0.5s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+    border: 3px solid #4a90e2;
+    box-shadow: 0 0 30px rgba(74, 144, 226, 0.3);
+}
+
+.avatar-circle.talking {
+    animation: pulse 0.5s ease-in-out infinite alternate;
+}
+
+/* Face del bot */
+.face {
+    position: relative;
+}
+
+.eyes {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.eye {
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    border-radius: 50%;
+    position: relative;
+    animation: blink 4s infinite;
+}
+
+.eye::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: #333;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.mouth {
+    width: 20px;
+    height: 10px;
+    background: #fff;
+    border-radius: 0 0 20px 20px;
+    transition: all 0.3s ease;
+}
+
+.mouth.talking {
+    animation: mouth-talk 0.2s ease-in-out infinite alternate;
+}
+
+/* Status Indicators */
+.status-indicators {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(74, 144, 226, 0.1);
+    border-radius: 8px;
+    border-left: 3px solid #4a90e2;
+}
+
+.status-item.ready {
+    border-left-color: #4CAF50;
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.status-item.warning {
+    border-left-color: #ff9800;
+    background: rgba(255, 152, 0, 0.1);
+}
+
+.status-item.error {
+    border-left-color: #f44336;
+    background: rgba(244, 67, 54, 0.1);
+}
+
+.status-icon {
+    font-size: 14px;
+}
+
+.status-text {
+    font-size: 12px;
+    color: #a0aec0;
+}
+
+/* Sezione Controlli */
+.controls-section {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-bottom: 1px solid #2a3f5f;
+}
+
+.control-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: transparent;
+    border: 1px solid #2a3f5f;
+    border-radius: 8px;
+    color: #a0aec0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.control-btn:hover {
+    background: rgba(74, 144, 226, 0.1);
+    border-color: #4a90e2;
+    color: #fff;
+}
+
+.control-btn.active {
+    background: #4a90e2;
+    border-color: #4a90e2;
+    color: #fff;
+}
+
+.btn-icon {
+    font-size: 16px;
+}
+
+.btn-text {
+    flex: 1;
+    text-align: left;
+}
+
+/* Sezione Conversazione */
+.conversation-section {
+    padding: 20px;
+    flex: 1;
+}
+
+.conversation-section h3 {
+    font-size: 14px;
+    color: #a0aec0;
+    margin-bottom: 12px;
+}
+
+.conversation-log {
+    background: rgba(42, 63, 95, 0.3);
+    border-radius: 8px;
+    padding: 12px;
+    max-height: 200px;
+    overflow-y: auto;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+/* AREA CHAT PRINCIPALE */
+.main-chat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #0f1419;
+}
+
+.chat-header {
+    padding: 20px 30px;
+    background: #16213e;
+    border-bottom: 1px solid #2a3f5f;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-header h1 {
+    font-size: 24px;
+    font-weight: 300;
+    color: #fff;
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+/* Indicatore modalità */
+.mode-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(74, 144, 226, 0.15);
+    padding: 10px 18px;
+    border-radius: 25px;
+    border: 1px solid #4a90e2;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.mode-icon {
+    font-size: 20px;
+    transition: transform 0.3s ease;
+}
+
+.mode-indicator:hover .mode-icon {
+    transform: scale(1.1);
+}
+
+.mode-name {
+    color: #4a90e2;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: color 0.3s ease;
+}
+
+.chat-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Importante per il flex */
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 30px;
+    padding-bottom: 10px; /* Spazio ridotto in fondo */
+    scrollbar-width: thin;
+    scrollbar-color: #4a90e2 #2d3748;
+}
+
+/* Messaggi Chat */
+.chat-message {
+    display: flex;
+    margin-bottom: 20px;
+    animation: fadeInUp 0.3s ease, slideIn 0.3s ease-out;
+    width: 100%; /* Assicura larghezza completa */
+}
+
+/* REGOLE SPECIFICHE PER LAYOUT VERTICALE */
+/* Forza tutti i contenuti dei messaggi ad essere disposti verticalmente */
+.chat-message {
+    display: flex;
+    margin-bottom: 20px;
+    animation: fadeInUp 0.3s ease, slideIn 0.3s ease-out;
+    width: 100%; /* Assicura larghezza completa */
+}
+
+/* Assicura che i messaggi AI non abbiano layout orizzontali accidentali */
+.ai-message {
+    justify-content: flex-start;
+    animation: slideInLeft 0.3s ease-out;
+    flex-direction: row; /* Avatar a sinistra, contenuto a destra */
+}
+
+/* Contenuto messaggi sempre verticale */
+.ai-message .message-content,
+.user-message .message-content {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Prevenzione layout orizzontali per code blocks multipli */
+.message-content .code-block + .code-block {
+    margin-top: 16px; /* Spazio extra tra code blocks consecutivi */
+}
+
+/* Prevenzione layout orizzontali per elementi inline */
+.message-content * {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Lista e altri elementi sempre verticali */
+.message-content ul,
+.message-content ol {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 8px 0;
+    padding-left: 0;
+}
+
+.message-content li {
+    display: block;
+    width: 100%;
+    margin: 4px 0;
+}
+
+/* Link musicali sempre verticali */
+.music-links {
+    display: flex;
+    flex-direction: column; /* Cambiato da flex-wrap a column per layout verticale */
+    gap: 8px;
+    margin: 10px 0;
+}
+
+.music-links a {
+    display: block; /* Ogni link su una riga separata */
+    width: 100%;
+}
+
+/* Messaggi AI - allineati a sinistra (default) */
+.ai-message {
+    justify-content: flex-start;
+    animation: slideInLeft 0.3s ease-out;
+}
+
+/* Messaggi utente - allineati a destra */
+.user-message {
+    justify-content: flex-end;
+    flex-direction: row-reverse;
+    animation: slideInRight 0.3s ease-out;
+}
+
+.message-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #4a90e2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+/* Avatar AI - margine a destra */
+.ai-message .message-avatar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    margin-right: 12px;
+}
+
+/* Avatar utente - margine a sinistra */
+.user-message .message-avatar {
+    background: #4a90e2;
+    margin-left: 12px;
+}
+
+.message-content {
+    flex: 1;
+    max-width: 75%; /* Limita la larghezza massima */
+    padding: 12px 16px;
+    border-radius: 18px;
+    word-wrap: break-word;
+    display: flex;
+    flex-direction: column; /* Assicura disposizione verticale del contenuto */
+    gap: 12px; /* Spazio tra elementi */
+}
+
+/* Contenuto messaggi AI - a sinistra */
+.ai-message .message-content {
+    background: #1e2a3a;
+    border-bottom-left-radius: 6px; /* Angolo più piccolo verso l'avatar */
+}
+
+/* Contenuto messaggi utente - a destra */
+.user-message .message-content {
+    background: #4a90e2;
+    border-bottom-right-radius: 6px; /* Angolo più piccolo verso l'avatar */
+}
+
+.message-content p {
+    margin: 0 0 8px 0; /* Margine inferiore per separare i paragrafi */
+    line-height: 1.5;
+    color: #e2e8f0;
+}
+
+.message-content p:last-child {
+    margin-bottom: 0; /* Rimuove il margine dall'ultimo paragrafo */
+}
+
+/* Assicura che tutti gli elementi nel contenuto siano disposti verticalmente */
+.message-content > * {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Code blocks nel contenuto dei messaggi */
+.message-content .code-block {
+    margin: 12px 0; /* Margine verticale per separare dai paragrafi */
+    width: 100%;
+    max-width: none; /* Rimuove limiti di larghezza */
+}
+
+/* Testo messaggi utente - bianco su sfondo blu */
+.user-message .message-content p {
+    color: #ffffff;
+}
+
+/* Link nei messaggi */
+.message-content a {
+    color: #4a90e2;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.message-content a:hover {
+    border-bottom-color: #4a90e2;
+    background: rgba(74, 144, 226, 0.1);
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+/* Link nei messaggi AI */
+.ai-message .message-content a {
+    color: #81c784;
+}
+
+.ai-message .message-content a:hover {
+    border-bottom-color: #81c784;
+    background: rgba(129, 199, 132, 0.1);
+}
+
+/* Link nei messaggi utente */
+.user-message .message-content a {
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.user-message .message-content a:hover {
+    border-bottom-color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Link musicali */
+.music-links {
+    display: flex;
+    flex-direction: column; /* Cambiato da flex-wrap a column per layout verticale */
+    gap: 8px;
+    margin: 10px 0;
+}
+
+.music-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    background: rgba(231, 76, 60, 0.1);
+    border-radius: 15px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin: 2px;
+}
+
+.music-link:hover {
+    background: rgba(231, 76, 60, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+
+/* Sezione Suggerimenti Messaggi */
+.message-suggestions {
+    background: #1e2a3a;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 0 30px 20px 30px; /* Margini laterali e bottom */
+    border-top: 1px solid #2a3f5f; /* Separatore visivo */
+    flex-shrink: 0; /* Non si riduce mai */
+}
+
+.message-suggestions h4 {
+    font-size: 14px;
+    color: #a0aec0;
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+}
+
+.suggestion-input {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 10; /* Sopra altri elementi */
+}
+
+.suggestion-input input {
+    flex: 1;
+    background: #2d3748;
+    border: 1px solid #4a5568;
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.suggestion-input input:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.suggestion-input input::placeholder {
+    color: #718096;
+}
+
+.send-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: #4a90e2;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.send-btn:hover {
+    background: #357abd;
+    transform: translateY(-1px);
+}
+
+.send-btn:disabled {
+    background: #4a5568;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Tag Categorie */
+.suggestion-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag-btn {
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid #4a5568;
+    border-radius: 20px;
+    color: #a0aec0;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.tag-btn:hover {
+    border-color: #4a90e2;
+    color: #4a90e2;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+.tag-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.tag-btn:hover::before {
+    left: 100%;
+}
+
+.tag-btn.active {
+    background: #4a90e2;
+    border-color: #4a90e2;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);
+    animation: pulseMode 2s ease-in-out infinite;
+}
+
+@keyframes pulseMode {
+    0%, 100% { box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4); }
+    50% { box-shadow: 0 6px 20px rgba(74, 144, 226, 0.6); }
+}
+
+/* Stili specifici per i tag delle modalità */
+.tag-btn.mode-musica.active {
+    background: #ff6b6b;
+    border-color: #ff6b6b;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+    animation: pulseMusicMode 2s ease-in-out infinite;
+}
+
+@keyframes pulseMusicMode {
+    0%, 100% { box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4); }
+    50% { box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6); }
+}
+
+.tag-btn.mode-musica:hover {
+    border-color: #ff6b6b;
+    color: #ff6b6b;
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.tag-btn.mode-programmatore.active {
+    background: #00d2d3;
+    border-color: #00d2d3;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 210, 211, 0.4);
+    animation: pulseProgMode 2s ease-in-out infinite;
+}
+
+@keyframes pulseProgMode {
+    0%, 100% { box-shadow: 0 6px 16px rgba(0, 210, 211, 0.4); }
+    50% { box-shadow: 0 6px 20px rgba(0, 210, 211, 0.6); }
+}
+
+.tag-btn.mode-programmatore:hover {
+    border-color: #00d2d3;
+    color: #00d2d3;
+    box-shadow: 0 4px 12px rgba(0, 210, 211, 0.3);
+}
+
+.tag-btn.mode-ricercatore.active {
+    background: #5f27cd;
+    border-color: #5f27cd;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(95, 39, 205, 0.4);
+    animation: pulseResearchMode 2s ease-in-out infinite;
+}
+
+@keyframes pulseResearchMode {
+    0%, 100% { box-shadow: 0 6px 16px rgba(95, 39, 205, 0.4); }
+    50% { box-shadow: 0 6px 20px rgba(95, 39, 205, 0.6); }
+}
+
+.tag-btn.mode-ricercatore:hover {
+    border-color: #5f27cd;
+    color: #5f27cd;
+    box-shadow: 0 4px 12px rgba(95, 39, 205, 0.3);
+}
+
+.tag-btn.mode-amico.active {
+    background: #26de81;
+    border-color: #26de81;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(38, 222, 129, 0.4);
+    animation: pulseFriendMode 2s ease-in-out infinite;
+}
+
+@keyframes pulseFriendMode {
+    0%, 100% { box-shadow: 0 6px 16px rgba(38, 222, 129, 0.4); }
+    50% { box-shadow: 0 6px 20px rgba(38, 222, 129, 0.6); }
+}
+
+.tag-btn.mode-amico:hover {
+    border-color: #26de81;
+    color: #26de81;
+    box-shadow: 0 4px 12px rgba(38, 222, 129, 0.3);
+}
+
+/* Indicatore modalità - colori dinamici */
+.mode-indicator.mode-musica {
+    background: rgba(255, 107, 107, 0.1);
+    border-color: #ff6b6b;
+}
+
+.mode-indicator.mode-musica .mode-name {
+    color: #ff6b6b;
+}
+
+.mode-indicator.mode-programmatore {
+    background: rgba(0, 210, 211, 0.1);
+    border-color: #00d2d3;
+}
+
+.mode-indicator.mode-programmatore .mode-name {
+    color: #00d2d3;
+}
+
+.mode-indicator.mode-ricercatore {
+    background: rgba(95, 39, 205, 0.1);
+    border-color: #5f27cd;
+}
+
+.mode-indicator.mode-ricercatore .mode-name {
+    color: #5f27cd;
+}
+
+.mode-indicator.mode-amico {
+    background: rgba(38, 222, 129, 0.1);
+    border-color: #26de81;
+}
+
+.mode-indicator.mode-amico .mode-name {
+    color: #26de81;
+}
+
+.typing-indicator {
+    opacity: 0.7;
+}
+
+.dots {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    background: #4a90e2;
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out both;
+}
+
+.dot:nth-child(1) { animation-delay: -0.32s; }
+.dot:nth-child(2) { animation-delay: -0.16s; }
+.dot:nth-child(3) { animation-delay: 0s; }
+
+/* Scrollbar personalizzata */
+.chat-messages::-webkit-scrollbar,
+.conversation-log::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track,
+.conversation-log::-webkit-scrollbar-track {
+    background: #2d3748;
+    border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb,
+.conversation-log::-webkit-scrollbar-thumb {
+    background: #4a5568;
+    border-radius: 3px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover,
+.conversation-log::-webkit-scrollbar-thumb:hover {
+    background: #718096;
+}
+
+/* Miglioramenti scrolling messaggi */
+.chat-messages {
+    scrollbar-width: thin;
+    scrollbar-color: #4a90e2 #2d3748;
+}
+
+/* Webkit scrollbar styling */
+.chat-messages::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: #2d3748;
+    border-radius: 4px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: #4a90e2;
+    border-radius: 4px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #357abd;
+}
+
+/* Assicura che l'ultimo messaggio sia sempre visibile */
+.chat-message:last-child {
+    margin-bottom: 10px;
+}
+
+/* Animazioni */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 30px rgba(74, 144, 226, 0.3); }
+    100% { transform: scale(1.05); box-shadow: 0 0 40px rgba(74, 144, 226, 0.6); }
+}
+
+@keyframes blink {
+    0%, 90%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.1); }
+}
+
+@keyframes mouth-talk {
+    0% { transform: scaleY(1); }
+    100% { transform: scaleY(1.5); }
+}
+
+@keyframes typing {
+    0%, 80%, 100% { 
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% { 
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animazioni specifiche per tipo di messaggio */
+.ai-message {
+    animation: slideInLeft 0.3s ease-out;
+}
+
+.user-message {
+    animation: slideInRight 0.3s ease-out;
+}
+
+/* Animazioni di entrata */
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Avatar per diverse modalità */
+.avatar-circle.mode-musica {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    border-color: #ff6b6b;
+    box-shadow: 0 0 30px rgba(255, 107, 107, 0.4);
+    animation: float 6s ease-in-out infinite, pulseMusicAvatar 3s ease-in-out infinite;
+}
+
+@keyframes pulseMusicAvatar {
+    0%, 100% { box-shadow: 0 0 30px rgba(255, 107, 107, 0.4); }
+    50% { box-shadow: 0 0 40px rgba(255, 107, 107, 0.7); }
+}
+
+.avatar-circle.mode-programmatore {
+    background: linear-gradient(135deg, #00d2d3 0%, #54a0ff 100%);
+    border-color: #00d2d3;
+    box-shadow: 0 0 30px rgba(0, 210, 211, 0.4);
+    animation: float 6s ease-in-out infinite, pulseProgAvatar 3s ease-in-out infinite;
+}
+
+@keyframes pulseProgAvatar {
+    0%, 100% { box-shadow: 0 0 30px rgba(0, 210, 211, 0.4); }
+    50% { box-shadow: 0 0 40px rgba(0, 210, 211, 0.7); }
+}
+
+.avatar-circle.mode-ricercatore {
+    background: linear-gradient(135deg, #5f27cd 0%, #00d2d3 100%);
+    border-color: #5f27cd;
+    box-shadow: 0 0 30px rgba(95, 39, 205, 0.4);
+    animation: float 6s ease-in-out infinite, pulseResearchAvatar 3s ease-in-out infinite;
+}
+
+@keyframes pulseResearchAvatar {
+    0%, 100% { box-shadow: 0 0 30px rgba(95, 39, 205, 0.4); }
+    50% { box-shadow: 0 0 40px rgba(95, 39, 205, 0.7); }
+}
+
+.avatar-circle.mode-amico {
+    background: linear-gradient(135deg, #26de81 0%, #20bf6b 100%);
+    border-color: #26de81;
+    box-shadow: 0 0 30px rgba(38, 222, 129, 0.4);
+    animation: float 6s ease-in-out infinite, pulseFriendAvatar 3s ease-in-out infinite;
+}
+
+@keyframes pulseFriendAvatar {
+    0%, 100% { box-shadow: 0 0 30px rgba(38, 222, 129, 0.4); }
+    50% { box-shadow: 0 0 40px rgba(38, 222, 129, 0.7); }
+}
+
+/* Icone specifiche per modalità (sovrascrivono la face) */
+.avatar-circle.mode-musica .face::after {
+    content: '🎵';
+    position: absolute;
+    font-size: 40px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.avatar-circle.mode-programmatore .face::after {
+    content: '💻';
+    position: absolute;
+    font-size: 40px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.avatar-circle.mode-ricercatore .face::after {
+    content: '🔬';
+    position: absolute;
+    font-size: 40px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.avatar-circle.mode-amico .face::after {
+    content: '😊';
+    position: absolute;
+    font-size: 40px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+/* Nascondi occhi e bocca quando l'avatar è in modalità icona */
+.avatar-circle.mode-musica .eyes,
+.avatar-circle.mode-musica .mouth,
+.avatar-circle.mode-programmatore .eyes,
+.avatar-circle.mode-programmatore .mouth,
+.avatar-circle.mode-ricercatore .eyes,
+.avatar-circle.mode-ricercatore .mouth,
+.avatar-circle.mode-amico .eyes,
+.avatar-circle.mode-amico .mouth {
+    display: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+        max-height: 40vh;
+    }
+    
+    .avatar-circle {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .controls-section {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .control-btn {
+        flex: 1;
+        min-width: calc(50% - 6px);
+    }
+    
+    .suggestion-input {
+        flex-direction: column;
+    }
+    
+    .send-btn {
+        width: 100%;
+        justify-content: center;
+    }
+      .message-content {
+        max-width: 85%; /* Più larghezza su mobile */
+        display: flex;
+        flex-direction: column; /* Assicura layout verticale su mobile */
+        gap: 10px;
+    }
+    
+    .message-avatar {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
+    
+    .ai-message .message-avatar {
+        margin-right: 8px;
+    }
+      .user-message .message-avatar {
+        margin-left: 8px;
+    }
+    
+    /* Code blocks responsivi - sempre verticali */
+    .code-block {
+        margin: 12px 0;
+        width: 100%;
+        overflow-x: auto;
+    }
+      .code-block-header {
+        padding: 6px 10px; /* Ancora più compatto su mobile */
+        font-size: 12px;
+        flex-direction: row; /* Mantieni orizzontale su mobile per compattezza */
+        gap: 8px;
+        align-items: center;
+        min-height: 32px; /* Altezza minima ridotta su mobile */
+    }
+    
+    .code-actions {
+        gap: 4px;
+    }
+    
+    .code-copy-btn, .code-edit-btn {
+        padding: 3px 6px;
+        font-size: 11px;
+        height: 22px;
+    }
+    
+    .music-player-container iframe {
+        height: 250px;
+    }
+    
+    .music-analysis {
+        padding: 12px;
+        font-size: 14px;
+    }
+}
+
+ /* ♟️ STILI SCACCHI INTERATTIVI */
+
+/* Container principale del gioco */
+.chess-game-container {
+    max-width: 900px; /* Aumentato da 700px */
+    margin: 20px auto;
+    background: #2c3e50;
+    border-radius: 15px; /* Più arrotondato */
+    padding: 25px; /* Più padding */
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4); /* Ombra più pronunciata */
+    border: 2px solid #34495e;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Area principale con layout flex */
+.chess-main-area {
+    display: flex;
+    gap: 25px; /* Aumentato da 20px */
+    align-items: flex-start;
+}
+
+/* Sezione della scacchiera */
+.chess-board-section {
+    flex: 0 0 auto;
+}
+
+/* Container principale della scacchiera */
+.chess-board-container {
+    max-width: 480px;
+    margin: 20px auto;
+    background: #2c3e50;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    border: 2px solid #34495e;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Status della partita */
+.chess-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 12px 16px;
+    background: #34495e;
+    border-radius: 8px;
+    border: 1px solid #4a5f7a;
+}
+
+.turn-indicator {
+    font-weight: bold;
+    font-size: 14px;
+    color: #ecf0f1;
+}
+
+.chess-surrender-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.chess-surrender-btn:hover {
+    background: #c0392b;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+
+/* Griglia della scacchiera */
+.chess-board-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    gap: 1px;
+    background: #2c3e50;
+    border: 3px solid #34495e;
+    border-radius: 10px; /* Più arrotondato */
+    overflow: hidden;
+    aspect-ratio: 1;
+    max-width: 480px; /* Aumentato da 400px */
+    margin: 0 auto;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1), 0 4px 16px rgba(0,0,0,0.2);
+}
+
+/* Caselle della scacchiera */
+.chess-square {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    font-size: 32px; /* Aumentato da 28px */
+    user-select: none;
+}
+
+/* Caselle chiare */
+.chess-square.light {
+    background: #f0d9b5;
+    color: #8b4513;
+}
+
+/* Caselle scure */
+.chess-square.dark {
+    background: #b58863;
+    color: #f0d9b5;
+}
+
+/* Casella selezionata */
+.chess-square.selected {
+    background: #3498db !important;
+    box-shadow: 0 0 15px rgba(243, 156, 18, 0.6);
+    animation: pulse-selection 1.5s infinite;
+}
+
+/* Animazione selezione casella */
+@keyframes pulse-selection {
+    0% { box-shadow: 0 0 15px rgba(243, 156, 18, 0.6); }
+    50% { box-shadow: 0 0 25px rgba(243, 156, 18, 0.8); }
+    100% { box-shadow: 0 0 15px rgba(243, 156, 18, 0.6); }
+}
+
+/* Effetto per le mosse possibili */
+.chess-square.possible-move {
+    background-color: rgba(46, 204, 113, 0.3) !important;
+    border: 2px solid #2ecc71;
+}
+
+.chess-square.possible-move::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #2ecc71;
+    border-radius: 50%;
+    opacity: 0.8;
+}
+
+/* Pezzo degli scacchi */
+.chess-piece {
+    font-size: 32px;
+    line-height: 1;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    display: inline-block;
+}
+
+/* Animazione dei pezzi */
+.chess-square:hover .chess-piece {
+    transform: scale(1.1);
+    filter: brightness(1.1);
+}
+
+.chess-square.selected .chess-piece {
+    transform: scale(1.2);
+    filter: brightness(1.2);
+}
+
+/* Colori dei pezzi */
+.chess-square.piece-white .chess-piece {
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+}
+
+.chess-square.piece-black .chess-piece {
+    color: #2c3e50;
+    text-shadow: 1px 1px 3px rgba(255,255,255,0.4);
+}
+
+/* Cronologia mosse */
+.chess-history {
+    margin-top: 15px;
+    padding: 12px 16px;
+    background: #34495e;
+    border-radius: 8px;
+    border: 1px solid #4a5f7a;
+    font-size: 12px;
+    color: #bdc3c7;
+}
+
+.moves-list {
+    font-family: 'Courier New', monospace;
+    color: #ecf0f1;
+    font-weight: 500;
+}
+
+/* Pannello delle mosse */
+.chess-moves-panel {    flex: 1;
+    min-width: 250px; /* Aumentato da 200px */
+    background: #34495e;
+    border-radius: 10px; /* Più arrotondato */
+    border: 1px solid #4a5f7a;
+    overflow: hidden;    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.chess-moves-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px; /* Aumentato padding */
+    background: #2c3e50;
+    border-bottom: 1px solid #4a5f7a;
+    cursor: pointer;
+}
+
+.moves-title {
+    font-weight: bold;
+    color: #ecf0f1;
+    font-size: 14px;
+}
+
+.moves-toggle-btn {
+    background: none;
+    border: none;
+    color: #bdc3c7;
+    cursor: pointer;
+    padding: 4px;
+    transition: all 0.2s ease;
+}
+
+.moves-toggle-btn:hover {
+    color: #ecf0f1;
+    transform: scale(1.1);
+}
+
+.toggle-icon {
+    transition: transform 0.3s ease;
+}
+
+.chess-moves-panel.collapsed .toggle-icon {
+    transform: rotate(-90deg);
+}
+
+.chess-moves-content {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.chess-moves-panel.collapsed .chess-moves-content {
+    max-height: 0;
+    padding: 0;
+}
+
+.moves-list-container {
+    max-height: 350px; /* Aumentato da 300px */
+    overflow-y: auto;
+    padding: 15px; /* Aumentato da 12px */
+}
+
+.moves-history {
+    font-family: 'Courier New', monospace;
+    font-size: 13px; /* Aumentato da 12px */
+}
+
+.move-pair {    display: flex;
+    align-items: center;
+    margin-bottom: 10px; /* Aumentato da 8px */
+    padding: 6px 10px; /* Aumentato padding */
+    border-radius: 6px; /* Più arrotondato */
+    background: #2c3e50;
+    border: 1px solid rgba(255,255,255,0.1);
+    font-size: 14px; /* Aggiunto font-size */
+}
+
+.move-number {
+    color: #3498db;
+    font-weight: bold;
+    min-width: 28px; /* Aumentato da 25px */
+    margin-right: 10px; /* Aumentato da 8px */
+}
+
+.white-move {
+    color: #ecf0f1;
+    margin-right: 10px; /* Aumentato da 8px */
+    font-weight: 500;
+}
+
+.black-move {
+    color: #bdc3c7;
+    font-weight: 500;
+}
+
+.no-moves {
+    color: #7f8c8d;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Notifica mossa AI */
+.ai-move-notification {
+    padding: 12px 16px;
+    background: #27ae60;
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    border-top: 1px solid #4a5f7a;
+    transform: translateY(100%);
+    transition: all 0.3s ease;
+}
+
+.ai-move-notification.show {
+    transform: translateY(0);
+    animation: pulse-ai-move 2s ease-in-out;
+}
+
+/* Animazione per notifiche AI */
+@keyframes pulse-ai-move {
+    0% { 
+        background-color: #27ae60;
+        box-shadow: 0 0 0 rgba(39, 174, 96, 0.4);
+    }
+    50% { 
+        background-color: #2ecc71;
+        box-shadow: 0 0 20px rgba(39, 174, 96, 0.6);
+    }
+    100% { 
+        background-color: #27ae60;
+        box-shadow: 0 0 0 rgba(39, 174, 96, 0.4);
+    }
+}
+
+.ai-move-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ai-move-content::before {
+    content: "🤖";
+    font-size: 16px;
+}
+
+/* Scrollbar personalizzata per il pannello mosse */
+.moves-list-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.moves-list-container::-webkit-scrollbar-track {
+    background: #2c3e50;
+    border-radius: 3px;
+}
+
+.moves-list-container::-webkit-scrollbar-thumb {
+    background: #4a5f7a;
+    border-radius: 3px;
+}
+
+.moves-list-container::-webkit-scrollbar-thumb:hover {
+    background: #5a6f8a;
+}
+
+/* Responsive design per il gioco degli scacchi */
+@media (max-width: 768px) {
+    .chess-game-container {
+        max-width: 100%;
+        padding: 15px;
+        margin: 15px;
+    }
+    
+    .chess-main-area {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .chess-moves-panel {
+        order: -1; /* Metti il pannello sopra su mobile */
+    }
+    
+    .chess-board-grid {
+        max-width: 320px;
+    }
+    
+    .chess-piece {
+        font-size: 24px;
+    }
+    
+    .chess-status {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .chess-game-container {
+        margin: 10px;
+        padding: 12px;
+    }
+    
+    .chess-board-grid {
+        max-width: 280px;
+    }
+    
+    .chess-piece {
+        font-size: 20px;
+    }
+    
+    .turn-indicator {
+        font-size: 12px;
+    }
+    
+    .chess-surrender-btn {
+        font-size: 11px;
+        padding: 6px 12px;
+    }
+    
+    .moves-list-container {
+        max-height: 200px;
+    }
+    
+    .move-pair {
+        font-size: 11px;
+    }
+}
+
+/* Fine stili scacchi */
