@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Moduli AI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .test-section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+        .test-section.error {
+            border-left-color: #f44336;
+        }
+        .status {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .status.error {
+            color: #f44336;
+        }
+        .console {
+            background: #000;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Moduli AI Bittron</h1>
+    <p>Questo file testa il caricamento e la funzionalità dei moduli AI modulari.</p>
+    
+    <div class="test-section" id="config-test">
+        <h3>⚙️ Test Configurazione</h3>
+        <div class="status" id="config-status">Testando...</div>
+        <div class="console" id="config-console"></div>
+    </div>
+    
+    <div class="test-section" id="handlers-test">
+        <h3>📦 Test Caricamento Handler</h3>
+        <div class="status" id="handlers-status">Testando...</div>
+        <div class="console" id="handlers-console"></div>
+    </div>
+    
+    <div class="test-section" id="functionality-test">
+        <h3>🎯 Test Funzionalità</h3>
+        <div class="status" id="functionality-status">Pronto per test</div>
+        <div>
+            <button onclick="testAmico()">Test Amico</button>
+            <button onclick="testMusica()">Test Musica</button>
+            <button onclick="testProgrammatore()">Test Programmatore</button>
+            <button onclick="testRicercatore()">Test Ricercatore</button>
+        </div>
+        <div class="console" id="functionality-console"></div>
+    </div>
+    
+    <div class="test-section" id="integration-test">
+        <h3>🔄 Test Integrazione</h3>
+        <div class="status" id="integration-status">Pronto per test</div>
+        <div>
+            <button onclick="testModeSwitch()">Test Cambio Modalità</button>
+            <button onclick="testSlashCommands()">Test Comandi Slash</button>
+        </div>
+        <div class="console" id="integration-console"></div>
+    </div>
+    
+    <!-- Script files -->
+    <script src="config.js"></script>
+    <script src="amico.js"></script>
+    <script src="musica.js"></script>
+    <script src="programmatore.js"></script>
+    <script src="ricercatore.js"></script>
+    <script src="main.js"></script>
+    
+    <script>
+        // Utility functions
+        function log(sectionId, message, isError = false) {
+            const console = document.getElementById(sectionId + '-console');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = isError ? '#f44336' : '#4CAF50';
+            console.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+            console.scrollTop = console.scrollHeight;
+        }
+        
+        function setStatus(sectionId, message, isError = false) {
+            const status = document.getElementById(sectionId + '-status');
+            status.textContent = message;
+            status.className = isError ? 'status error' : 'status';
+            
+            const section = document.getElementById(sectionId);
+            section.className = isError ? 'test-section error' : 'test-section';
+        }
+        
+        // Test configuration
+        function testConfig() {
+            try {
+                log('config', 'Testando caricamento configurazione...');
+                
+                if (typeof AI_CONFIG !== 'undefined') {
+                    log('config', '✅ AI_CONFIG caricato correttamente');
+                    log('config', `Modalità: ${Object.keys(AI_CONFIG).join(', ')}`);
+                    setStatus('config', 'Configurazione OK');
+                } else {
+                    log('config', '❌ AI_CONFIG non trovato', true);
+                    setStatus('config', 'Errore: Configurazione mancante', true);
+                }
+            } catch (error) {
+                log('config', `❌ Errore test configurazione: ${error.message}`, true);
+                setStatus('config', 'Errore nel test configurazione', true);
+            }
+        }
+        
+        // Test handlers loading
+        function testHandlers() {
+            try {
+                log('handlers', 'Testando caricamento handlers...');
+                
+                const handlers = {
+                    'AmicoHandler': AmicoHandler,
+                    'MusicaHandler': MusicaHandler,
+                    'ProgrammatoreHandler': ProgrammatoreHandler,
+                    'RicercatoreHandler': RicercatoreHandler
+                };
+                
+                let allLoaded = true;
+                
+                for (const [name, handler] of Object.entries(handlers)) {
+                    if (typeof handler !== 'undefined') {
+                        log('handlers', `✅ ${name} caricato`);
+                    } else {
+                        log('handlers', `❌ ${name} non caricato`, true);
+                        allLoaded = false;
+                    }
+                }
+                
+                if (allLoaded) {
+                    setStatus('handlers', 'Tutti gli handler caricati');
+                    log('handlers', '🎉 Tutti gli handler sono stati caricati con successo!');
+                } else {
+                    setStatus('handlers', 'Alcuni handler mancanti', true);
+                }
+            } catch (error) {
+                log('handlers', `❌ Errore test handlers: ${error.message}`, true);
+                setStatus('handlers', 'Errore nel test handlers', true);
+            }
+        }
+        
+        // Test individual handlers
+        async function testAmico() {
+            try {
+                log('functionality', 'Testando AmicoHandler...');
+                const mockMain = { getAIResponse: () => Promise.resolve('Mock AI response') };
+                const handler = new AmicoHandler(mockMain);
+                
+                const response = await handler.handleMessage('ciao, come stai?');
+                log('functionality', `✅ Amico: ${response.substring(0, 50)}...`);
+            } catch (error) {
+                log('functionality', `❌ Errore test Amico: ${error.message}`, true);
+            }
+        }
+        
+        async function testMusica() {
+            try {
+                log('functionality', 'Testando MusicaHandler...');
+                const mockMain = { getAIResponse: () => Promise.resolve('Mock AI response') };
+                const handler = new MusicaHandler(mockMain);
+                
+                const response = await handler.handleMessage('cerca musica rock');
+                log('functionality', `✅ Musica: ${response.substring(0, 50)}...`);
+            } catch (error) {
+                log('functionality', `❌ Errore test Musica: ${error.message}`, true);
+            }
+        }
+        
+        async function testProgrammatore() {
+            try {
+                log('functionality', 'Testando ProgrammatoreHandler...');
+                const mockMain = { getAIResponse: () => Promise.resolve('Mock AI response') };
+                const handler = new ProgrammatoreHandler(mockMain);
+                
+                const response = await handler.handleMessage('/template javascript');
+                log('functionality', `✅ Programmatore: ${response.substring(0, 50)}...`);
+            } catch (error) {
+                log('functionality', `❌ Errore test Programmatore: ${error.message}`, true);
+            }
+        }
+        
+        async function testRicercatore() {
+            try {
+                log('functionality', 'Testando RicercatoreHandler...');
+                const mockMain = { getAIResponse: () => Promise.resolve('Mock AI response') };
+                const handler = new RicercatoreHandler(mockMain);
+                
+                const response = await handler.handleMessage('/sources academic');
+                log('functionality', `✅ Ricercatore: ${response.substring(0, 50)}...`);
+            } catch (error) {
+                log('functionality', `❌ Errore test Ricercatore: ${error.message}`, true);
+            }
+        }
+        
+        // Test main system
+        async function testModeSwitch() {
+            try {
+                log('integration', 'Testando cambio modalità...');
+                
+                if (typeof VirtualFriend !== 'undefined') {
+                    log('integration', '✅ VirtualFriend disponibile');
+                    log('integration', 'Test cambio modalità completato (richiede DOM completo)');
+                } else {
+                    log('integration', '❌ VirtualFriend non disponibile', true);
+                }
+            } catch (error) {
+                log('integration', `❌ Errore test cambio modalità: ${error.message}`, true);
+            }
+        }
+        
+        async function testSlashCommands() {
+            try {
+                log('integration', 'Testando comandi slash...');
+                
+                const tests = [
+                    { handler: 'ProgrammatoreHandler', command: '/help' },
+                    { handler: 'RicercatoreHandler', command: '/methods' }
+                ];
+                
+                for (const test of tests) {
+                    const HandlerClass = window[test.handler];
+                    if (HandlerClass) {
+                        const mockMain = { getAIResponse: () => Promise.resolve('Mock AI response') };
+                        const handler = new HandlerClass(mockMain);
+                        
+                        if (handler.handleSlashCommand) {
+                            const response = handler.handleSlashCommand(test.command);
+                            log('integration', `✅ ${test.handler} slash command: OK`);
+                        }
+                    }
+                }
+            } catch (error) {
+                log('integration', `❌ Errore test slash commands: ${error.message}`, true);
+            }
+        }
+        
+        // Run initial tests
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                testConfig();
+                testHandlers();
+                setStatus('functionality', 'Clicca i pulsanti per testare');
+                setStatus('integration', 'Clicca i pulsanti per testare');
+            }, 500);
+        });
+        
+        // Global error handler
+        window.addEventListener('error', (event) => {
+            console.error('Global error:', event.error);
+            log('config', `❌ Errore globale: ${event.error.message}`, true);
+        });
+    </script>
+</body>
+</html>

@@ -3,111 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amico Virtuale AI</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Bittron AI - Assistente Futuristico</title>
+    
+    <!-- Bulma CSS Framework -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    
+    <!-- Font Awesome per le icone -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style-modern.css">
 </head>
-<body>
-    <div class="app-container">
-        <!-- Sidebar sinistra -->
-        <div class="sidebar">
-            <!-- Avatar Section -->
-            <div class="avatar-section">
-                <div class="avatar-circle" id="avatar">
-                    <div class="face">
-                        <div class="eyes">
-                            <div class="eye left-eye"></div>
-                            <div class="eye right-eye"></div>
+<body class="has-background-dark">
+    <!-- Navigation Top Bar -->
+    <nav class="navbar is-dark is-transparent navbar-futuristic" role="navigation">
+        <div class="navbar-brand">
+            <div class="navbar-item">
+                <div class="brand-logo">
+                    <i class="fas fa-robot brand-icon"></i>
+                    <span class="brand-text">BITTRON</span>
+                    <span class="brand-version">AI v2.0</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="navbar-menu">
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <div class="status-panel">
+                        <div class="status-item" id="ai-status">
+                            <span class="status-dot is-success"></span>
+                            <span class="status-text">AI Online</span>
                         </div>
-                        <div class="mouth" id="mouth"></div>
+                        <div class="status-item" id="memory-status">
+                            <i class="fas fa-brain"></i>
+                            <span class="memory-count">0/10</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Application Container -->
+    <div class="app-container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar-panel">
+            <!-- Avatar Section -->
+            <div class="avatar-container">
+                <div class="avatar-hologram" id="avatar">
+                    <div class="hologram-ring"></div>
+                    <div class="hologram-ring ring-2"></div>
+                    <div class="hologram-ring ring-3"></div>
+                    <div class="avatar-core">
+                        <div class="avatar-face">
+                            <div class="eyes-container">
+                                <div class="eye left-eye">
+                                    <div class="eye-pupil"></div>
+                                </div>
+                                <div class="eye right-eye">
+                                    <div class="eye-pupil"></div>
+                                </div>
+                            </div>
+                            <div class="mouth-container">
+                                <div class="mouth" id="mouth"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
-                <!-- Status Indicators -->
-                <div class="status-indicators">
-                    <div class="status-item" id="ai-status">
-                        <span class="status-icon">🧠</span>
-                        <span class="status-text">AI: Connesso e pronto</span>
-                    </div>
-                    <div class="status-item" id="memory-status">
-                        <span class="status-icon">🧠</span>
-                        <span class="status-text">Memoria: 0/10 scambi</span>
-                    </div>
-                    <div class="status-item" id="search-status">
-                        <span class="status-icon">🔍</span>
-                        <span class="status-text">Ricerca: Online</span>
-                    </div>
+                <div class="avatar-info">
+                    <h3 class="avatar-name">BITTRON</h3>
+                    <p class="avatar-subtitle">Assistente AI Avanzato</p>
                 </div>
             </div>
 
-            <!-- Controls Section -->
-            <div class="controls-section">
-                <button id="test-ai" class="control-btn">
-                    <span class="btn-icon">🧠</span>
-                    <span class="btn-text">Test AI</span>
-                </button>
-                <button id="test-search" class="control-btn">
-                    <span class="btn-icon">🔍</span>
-                    <span class="btn-text">Test Ricerca</span>
-                </button>
-                <button id="toggle-chat" class="control-btn active">
-                    <span class="btn-icon">💬</span>
-                    <span class="btn-text">Chat Attiva</span>
-                </button>
-                <button id="clear-memory" class="control-btn">
-                    <span class="btn-icon">🗑️</span>
-                    <span class="btn-text">Cancella Memoria</span>
-                </button>
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <h4 class="panel-title">
+                    <i class="fas fa-cogs"></i>
+                    CONTROLLI
+                </h4>
+                
+                <div class="control-buttons">
+                    <button class="btn-futuristic btn-primary" id="test-ai">
+                        <div class="btn-glow"></div>
+                        <i class="fas fa-brain"></i>
+                        <span>Test AI</span>
+                    </button>
+                    
+                    <button class="btn-futuristic btn-info" id="test-search">
+                        <div class="btn-glow"></div>
+                        <i class="fas fa-search"></i>
+                        <span>Test Ricerca</span>
+                    </button>
+                    
+                    <button class="btn-futuristic btn-success is-active" id="toggle-chat">
+                        <div class="btn-glow"></div>
+                        <i class="fas fa-comments"></i>
+                        <span>Chat Attiva</span>
+                    </button>
+                    
+                    <button class="btn-futuristic btn-warning" id="clear-memory">
+                        <div class="btn-glow"></div>
+                        <i class="fas fa-trash-alt"></i>
+                        <span>Reset Memoria</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- Conversazione Vocale Section (nascosta, mantenuta per compatibilità) -->
+            <!-- Hidden conversation section for compatibility -->
             <div class="conversation-section" style="display: none;">
-                <h3>🎤 Conversazione Vocale:</h3>
                 <div id="transcript" class="conversation-log">
                     <p><em>Log delle conversazioni...</em></p>
                 </div>
             </div>
-        </div>
+        </aside>
 
-        <!-- Main Chat Area -->
-        <div class="main-chat">            <div class="chat-header">
-                <h1>CHAT</h1>
-                <div class="mode-indicator" id="mode-indicator">
-                    <span class="mode-icon">🎵</span>
-                    <span class="mode-name">Modalità: Musica</span>
+        <!-- Main Chat Interface -->
+        <main class="chat-interface">
+            <!-- Chat Header -->
+            <header class="chat-header">
+                <div class="header-content">
+                    <div class="chat-title">
+                        <h1 class="title-text">NEURAL CHAT</h1>
+                        <div class="title-underline"></div>
+                    </div>
+                    
+                    <div class="mode-selector" id="mode-indicator">
+                        <div class="mode-display">
+                            <span class="mode-icon">🎵</span>
+                            <span class="mode-text">Modalità: Musica</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </header>
             
-            <div class="chat-container" id="chat-section">
-                <div class="chat-messages" id="chat-messages">
-                    <div class="chat-message ai-message">
-                        <div class="message-avatar">🤖</div>
-                        <div class="message-content">
-                            <p>Ciao! Scrivi qui il tuo messaggio per iniziare a chattare. Come posso aiutarti?</p>
+            <!-- Chat Messages Area -->
+            <div class="chat-content" id="chat-section">
+                <div class="messages-container" id="chat-messages">
+                    <div class="message-item ai-message">
+                        <div class="message-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-bubble">
+                            <div class="message-header">
+                                <span class="sender-name">BITTRON</span>
+                                <span class="message-time">Ora</span>
+                            </div>
+                            <div class="message-text">
+                                <p>🚀 Sistema operativo. Benvenuto nell'interfaccia neurale avanzata! Come posso assisterti oggi?</p>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Quadro Messaggi (area per messaggi suggeriti) -->
-                <div class="message-suggestions">
-                    <h4>QUADRO MESSAGGI</h4>
-                    <div class="suggestion-input">
-                        <input type="text" placeholder="Parla con Bittron" id="chat-input">
-                        <button id="send-message" class="send-btn">
-                            <span class="btn-icon">⚙️</span>
-                            <span class="btn-text">Modalità bittron</span>
+                <!-- Input Panel -->
+                <div class="input-panel">
+                    <div class="panel-header">
+                        <h4 class="panel-title">
+                            <i class="fas fa-terminal"></i>
+                            INTERFACCIA NEURALE
+                        </h4>
+                    </div>
+                    
+                    <div class="input-container">
+                        <div class="input-field">
+                            <input type="text" class="input-futuristic" placeholder="Inserisci comando neurale..." id="chat-input">
+                            <button class="send-button" id="send-message">
+                                <div class="send-glow"></div>
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Mode Selection Tags -->
+                    <div class="mode-tags">
+                        <button class="mode-tag is-active" data-category="musica">
+                            <div class="tag-glow"></div>
+                            <i class="fas fa-music"></i>
+                            <span>MUSICA</span>
                         </button>
-                    </div>                    <div class="suggestion-tags">
-                        <button class="tag-btn mode-musica active" data-category="musica">🎵 musica</button>
-                        <button class="tag-btn mode-programmatore" data-category="programmatore">💻 Programmatore</button>
-                        <button class="tag-btn mode-ricercatore" data-category="ricercatore">🔬 Ricercatore</button>
-                        <button class="tag-btn mode-amico" data-category="amico">😊 Amico</button>
+                        
+                        <button class="mode-tag" data-category="programmatore">
+                            <div class="tag-glow"></div>
+                            <i class="fas fa-code"></i>
+                            <span>CODE</span>
+                        </button>
+                        
+                        <button class="mode-tag" data-category="ricercatore">
+                            <div class="tag-glow"></div>
+                            <i class="fas fa-microscope"></i>
+                            <span>RESEARCH</span>
+                        </button>
+                        
+                        <button class="mode-tag" data-category="amico">
+                            <div class="tag-glow"></div>
+                            <i class="fas fa-heart"></i>
+                            <span>FRIEND</span>
+                        </button>
                     </div>
                 </div>
             </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring ring-2"></div>
+            <div class="spinner-ring ring-3"></div>
+            <div class="loading-text">ELABORAZIONE NEURALE</div>
         </div>
     </div>
 
     <script src="config.js"></script>
-    <script src="script.js"></script>
+    
+    <!-- Moduli AI -->
+    <script src="amico.js"></script>
+    <script src="musica.js"></script>
+    <script src="programmatore.js"></script>
+    <script src="ricercatore.js"></script>
+    
+    <!-- Main coordinator -->
+    <script src="main.js"></script>
 </body>
 </html>

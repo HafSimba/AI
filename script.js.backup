@@ -59,7 +59,7 @@ class VirtualFriend {    constructor() {
         
         // Nuovi elementi per sistema modalità
         this.modeIndicator = document.getElementById('mode-indicator');
-        this.tagBtns = document.querySelectorAll('.tag-btn');
+        this.tagBtns = document.querySelectorAll('.tag-btn, .mode-tag');
         
         console.log('🔧 Elementi trovati:', {
             chatSection: !!this.chatSection,
@@ -137,6 +137,9 @@ class VirtualFriend {    constructor() {
             console.error('❌ Errore nell\'inizializzazione interfaccia:', error);
             this.addTranscriptMessage('🤖 Ciao! Sono il tuo amico virtuale. Attiva il microfono per iniziare a parlare!');
         }
+        
+        // Inizializza stili YouTube Player
+        this.initializeYouTubePlayerStyles();
           // Test AI connection on startup
         this.testAIConnection();
         
@@ -191,9 +194,11 @@ class VirtualFriend {    constructor() {
                 console.log('🔧 Tag button cliccato:', btn.dataset.category);
                 
                 // Remove active class from all buttons
-                this.tagBtns.forEach(b => b.classList.remove('active'));
+                this.tagBtns.forEach(b => {
+                    b.classList.remove('active', 'is-active');
+                });
                 // Add active class to clicked button
-                btn.classList.add('active');
+                btn.classList.add('active', 'is-active');
                 
                 // Get category or message
                 const category = btn.dataset.category;
@@ -264,8 +269,13 @@ class VirtualFriend {    constructor() {
             
             // Aggiorna indicatore modalità
             if (this.modeIndicator) {
-                this.modeIndicator.textContent = `${modeConfig.icon} ${modeConfig.name}`;
-                this.modeIndicator.style.color = modeConfig.color;
+                const modeIconElement = this.modeIndicator.querySelector('.mode-icon');
+                const modeTextElement = this.modeIndicator.querySelector('.mode-text');
+                
+                if (modeIconElement && modeTextElement) {
+                    modeIconElement.textContent = modeConfig.icon;
+                    modeTextElement.textContent = modeConfig.name;
+                }
             }
             
             // Messaggio di benvenuto per la nuova modalità
@@ -655,11 +665,11 @@ class VirtualFriend {    constructor() {
                 const youtubeResults = await this.searchYouTube(searchQuery);
                 
                 if (youtubeResults.length > 0) {
-                    const topSongs = youtubeResults.slice(0, 3);
-                    let youtubeSection = '\n\n🎬 **Trovato su YouTube:**\n';
+                    const topSongs = youtubeResults.slice(0, 2); // Ridotto a 2 per evitare spam
+                    let youtubeSection = '\n\n🎬 **Top Brani su YouTube:**\n\n';
                     
                     topSongs.forEach((song, index) => {
-                        youtubeSection += `\n${index + 1}. [${song.title}](${song.url})\n`;
+                        youtubeSection += this.createYouTubeEmbed(song) + '\n';
                     });
                     
                     return `${aiRecommendations}${youtubeSection}`;
@@ -690,10 +700,10 @@ class VirtualFriend {    constructor() {
             
             if (youtubeResults.length > 0) {
                 const similarSongs = youtubeResults.slice(0, 2);
-                let youtubeSection = '\n\n🎬 **Esempi trovati:**\n';
+                let youtubeSection = '\n\n🎬 **Esempi che potresti gradire:**\n\n';
                 
-                similarSongs.forEach((song, index) => {
-                    youtubeSection += `\n• [${song.title}](${song.url})\n`;
+                similarSongs.forEach(song => {
+                    youtubeSection += this.createYouTubeEmbed(song) + '\n';
                 });
                 
                 return `${aiResponse}${youtubeSection}`;
@@ -722,11 +732,11 @@ class VirtualFriend {    constructor() {
             const youtubeResults = await this.searchYouTube(searchQuery);
             
             if (youtubeResults.length > 0) {
-                const popularSongs = youtubeResults.slice(0, 3);
-                let songsSection = '\n\n🎵 **Canzoni popolari:**\n';
+                const popularSongs = youtubeResults.slice(0, 2); // Ridotto a 2 per evitare spam
+                let songsSection = '\n\n🎵 **Le sue canzoni più popolari:**\n\n';
                 
-                popularSongs.forEach((song, index) => {
-                    songsSection += `\n${index + 1}. [${song.title}](${song.url})\n`;
+                popularSongs.forEach(song => {
+                    songsSection += this.createYouTubeEmbed(song) + '\n';
                 });
                 
                 return `${aiResponse}${songsSection}`;
@@ -753,30 +763,272 @@ class VirtualFriend {    constructor() {
         }
     }
     
-    // 🎬 Crea componente embed YouTube
+    // 🎬 Crea componente embed YouTube AVANZATO
     createYouTubeEmbed(videoData) {
         const videoId = this.extractYouTubeVideoId(videoData.url);
+        if (!videoId) {
+            return this.createFallbackVideoPlayer(videoData);
+        }
+        
         const embedOptions = AI_CONFIG?.youtube?.embedOptions || {};
+        const width = embedOptions.width || 400;
+        const height = embedOptions.height || 225;
+        const playerId = 'youtube-player-' + Math.random().toString(36).substr(2, 9);
         
-        const width = embedOptions.width || 320;
-        const height = embedOptions.height || 180;
-        const autoplay = AI_CONFIG?.youtube?.autoplay ? 1 : 0;
+        return `<div class="youtube-player-container" style="
+            margin: 15px 0; 
+            background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+            border-radius: 12px; 
+            padding: 16px; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 1px solid #404040;
+            max-width: 450px;
+        ">
+            <div class="video-header" style="
+                display: flex; 
+                align-items: center; 
+                margin-bottom: 12px; 
+                padding-bottom: 8px; 
+                border-bottom: 1px solid #404040;
+            ">
+                <div class="youtube-logo" style="
+                    background: #ff0000; 
+                    color: white; 
+                    padding: 4px 8px; 
+                    border-radius: 4px; 
+                    font-size: 12px; 
+                    font-weight: bold;
+                    margin-right: 10px;
+                ">▶ YouTube</div>
+                <div class="video-title" style="
+                    color: #e8e8e8; 
+                    font-size: 14px; 
+                    font-weight: 500;
+                    flex: 1;
+                    line-height: 1.3;
+                ">${this.truncateTitle(videoData.title)}</div>
+            </div>
+            
+            <div class="player-wrapper" style="
+                position: relative; 
+                background: #000; 
+                border-radius: 8px; 
+                overflow: hidden;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            ">
+                <div id="${playerId}" class="youtube-player" style="
+                    width: 100%; 
+                    height: ${height}px; 
+                    background: #000 url('https://img.youtube.com/vi/${videoId}/mqdefault.jpg') center/cover;
+                    position: relative;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                " onclick="virtualFriend.loadYouTubePlayer('${videoId}', '${playerId}')">
+                    <div class="play-overlay" style="
+                        position: absolute;
+                        top: 0; left: 0; right: 0; bottom: 0;
+                        background: rgba(0,0,0,0.4);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: all 0.3s ease;
+                    ">
+                        <div class="play-button" style="
+                            width: 60px; 
+                            height: 60px; 
+                            background: #ff0000;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            box-shadow: 0 4px 15px rgba(255,0,0,0.4);
+                            transition: all 0.3s ease;
+                        ">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="video-controls" style="
+                display: flex; 
+                justify-content: space-between; 
+                align-items: center; 
+                margin-top: 12px;
+                padding-top: 8px;
+                border-top: 1px solid #404040;
+            ">
+                <div class="video-actions" style="display: flex; gap: 8px;">
+                    <button onclick="virtualFriend.openInYouTube('${videoData.url}')" style="
+                        background: #ff0000; 
+                        color: white; 
+                        border: none; 
+                        padding: 6px 12px; 
+                        border-radius: 6px; 
+                        font-size: 12px; 
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.background='#e60000'" onmouseout="this.style.background='#ff0000'">
+                        🔗 YouTube
+                    </button>
+                    <button onclick="virtualFriend.shareVideo('${videoData.url}', '${videoData.title.replace(/'/g, "\\\'")}')" style="
+                        background: #404040; 
+                        color: #e8e8e8; 
+                        border: none; 
+                        padding: 6px 12px; 
+                        border-radius: 6px; 
+                        font-size: 12px; 
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    " onmouseover="this.style.background='#505050'" onmouseout="this.style.background='#404040'">
+                        📤 Condividi
+                    </button>
+                </div>
+                <div class="video-info" style="
+                    color: #888; 
+                    font-size: 11px;
+                    text-align: right;
+                ">
+                    ${videoData.channelTitle || 'YouTube'}
+                </div>
+            </div>
+        </div>`;
+    }
+    
+    // 🔄 Crea player di fallback per video non YouTube
+    createFallbackVideoPlayer(videoData) {
+        return `<div class="fallback-video-player" style="
+            margin: 15px 0; 
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 12px; 
+            padding: 16px; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: 1px solid #404040;
+            max-width: 450px;
+        ">
+            <div class="video-header" style="
+                display: flex; 
+                align-items: center; 
+                margin-bottom: 12px;
+            ">
+                <div class="music-icon" style="
+                    background: #e74c3c; 
+                    color: white; 
+                    padding: 8px; 
+                    border-radius: 50%; 
+                    margin-right: 12px;
+                ">🎵</div>
+                <div class="video-title" style="
+                    color: #e8e8e8; 
+                    font-size: 14px; 
+                    font-weight: 500;
+                    line-height: 1.3;
+                ">${videoData.title}</div>
+            </div>
+            
+            <div style="text-align: center; padding: 20px;">
+                <p style="color: #bdc3c7; margin-bottom: 15px;">🔗 Link esterno rilevato</p>
+                <button onclick="window.open('${videoData.url}', '_blank')" style="
+                    background: #e74c3c; 
+                    color: white; 
+                    border: none; 
+                    padding: 12px 24px; 
+                    border-radius: 8px; 
+                    font-size: 14px; 
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                " onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='#e74c3c'">
+                    🎵 Ascolta Ora
+                </button>
+            </div>
+        </div>`;
+    }
+    
+    // ✂️ Accorcia i titoli lunghi
+    truncateTitle(title, maxLength = 60) {
+        if (title.length <= maxLength) return title;
+        return title.substring(0, maxLength - 3) + '...';
+    }
+    
+    // 🎬 Carica player YouTube dinamicamente
+    loadYouTubePlayer(videoId, playerId) {
+        const playerElement = document.getElementById(playerId);
+        if (!playerElement) return;
         
-        return `<div class="youtube-embed-container" style="margin: 10px 0; text-align: center;">
-    <iframe 
-        width="${width}" 
-        height="${height}"
-        src="https://www.youtube.com/embed/${videoId}?autoplay=${autoplay}&modestbranding=1&rel=0"
-        title="${videoData.title}"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen>
-    </iframe>
-    <div class="video-info" style="margin-top: 8px; font-size: 12px; color: #666;">
-        <strong>${videoData.title}</strong><br>
-        <a href="${videoData.url}" target="_blank" style="color: #ff0000;">▶ Apri su YouTube</a>
-    </div>
-</div>`;
+        // Sostituisce il placeholder con iframe YouTube
+        playerElement.innerHTML = `
+            <iframe 
+                width="100%" 
+                height="100%"
+                src="https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+                style="border-radius: 8px;">
+            </iframe>
+        `;
+        
+        // Aggiunge animazione di caricamento
+        playerElement.style.transition = 'all 0.3s ease';
+        
+        console.log('🎬 Player YouTube caricato per video:', videoId);
+    }
+    
+    // 🔗 Apre video su YouTube
+    openInYouTube(url) {
+        window.open(url, '_blank');
+        console.log('🔗 Apertura YouTube:', url);
+    }
+    
+    // 📤 Condivide video
+    shareVideo(url, title) {
+        if (navigator.share) {
+            navigator.share({
+                title: title,
+                url: url
+            }).catch(err => console.log('Errore condivisione:', err));
+        } else {
+            // Fallback: copia negli appunti
+            navigator.clipboard.writeText(url).then(() => {
+                this.showNotification('🔗 Link copiato negli appunti!');
+            }).catch(() => {
+                // Fallback finale: mostra popup
+                prompt('Copia questo link:', url);
+            });
+        }
+    }
+    
+    // 📢 Mostra notifiche temporanee
+    showNotification(message, type = 'success') {
+        const notification = document.createElement('div');
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#27ae60' : '#e74c3c'};
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 10000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            animation: slideInNotification 0.3s ease-out;
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.style.animation = 'slideOutNotification 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
+            }
+        }, 3000);
     }
     
     // 🔍 Estrae l'ID del video YouTube dall'URL
@@ -833,7 +1085,7 @@ class VirtualFriend {    constructor() {
         
         // Pattern per riconoscere richieste musicali
         const patterns = [
-            /(?:suona|ascolta|cerca|trova|metti)\s+(?:la\s+)?(?:canzone\s+)?["']?([^"']+)["']?/i,
+            /(?:suona|ascolta|cerca|trova|metti|canzone|brano|musica)\s+(?:la\s+)?(?:canzone\s+)?["']?([^"']+)["']?/i,
             /(?:canzone|brano|musica)\s+["']?([^"']+)["']?/i,
             /["']([^"']+)["']\s+(?:di|by)\s+([^"']+)/i,
             /([^"']+)\s+(?:di|by)\s+([^"']+)/i
@@ -966,45 +1218,106 @@ class VirtualFriend {    constructor() {
         }
         
         const messageDiv = document.createElement('div');
-        messageDiv.className = `chat-message ${sender}-message`;
+        messageDiv.className = `message-item ${sender}-message`;
         
-        // Crea struttura message con avatar
+        // Crea avatar con icona Font Awesome
         const avatarDiv = document.createElement('div');
         avatarDiv.className = 'message-avatar';
-        avatarDiv.textContent = sender === 'ai' ? '🤖' : '👤';
         
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'message-content';
+        const avatarIcon = document.createElement('i');
+        avatarIcon.className = sender === 'ai' ? 'fas fa-robot' : 'fas fa-user';
+        avatarDiv.appendChild(avatarIcon);
+        
+        // Crea bubble per il messaggio
+        const bubbleDiv = document.createElement('div');
+        bubbleDiv.className = 'message-bubble';
+        
+        // Header del messaggio
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'message-header';
+        
+        const senderName = document.createElement('span');
+        senderName.className = 'sender-name';
+        senderName.textContent = sender === 'ai' ? 'BITTRON' : 'USER';
+        
+        const messageTime = document.createElement('span');
+        messageTime.className = 'message-time';
+        messageTime.textContent = new Date().toLocaleTimeString('it-IT', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+        
+        headerDiv.appendChild(senderName);
+        headerDiv.appendChild(messageTime);
+        
+        // Contenuto del messaggio
+        const textDiv = document.createElement('div');
+        textDiv.className = 'message-text';
         
         // 🎵 Formattazione speciale per modalità musica con embed YouTube
-        if (this.currentCategory === 'musica' && sender === 'ai' && message.includes('youtube-embed-container')) {
-            contentDiv.innerHTML = this.formatMusicMessage(message);
+        if (this.currentCategory === 'musica' && sender === 'ai' && (message.includes('youtube-player-container') || message.includes('youtube-embed-container'))) {
+            // Inizializza gli stili per i player se non già fatto
+            this.initializeYouTubePlayerStyles();
+            textDiv.innerHTML = this.formatMusicMessage(message);
         }
         // 💻 Formattazione speciale per modalità programmatore
         else if (this.currentCategory === 'programmatore' && sender === 'ai') {
-            contentDiv.innerHTML = this.formatProgrammerMessage(message);
+            textDiv.innerHTML = this.formatProgrammerMessage(message);
         }
         // 🔍 Formattazione speciale per modalità ricercatore
         else if (this.currentCategory === 'ricercatore' && sender === 'ai') {
-            contentDiv.innerHTML = this.formatResearcherMessage(message);
+            textDiv.innerHTML = this.formatResearcherMessage(message);
         }
         else {
-            // Per messaggi semplici, usa textContent per sicurezza
-            contentDiv.textContent = message;
+            // Per messaggi semplici, formatta markdown base
+            textDiv.innerHTML = this.formatBasicMessage(message);
         }
         
-        // Aggiungi avatar e contenuto al messaggio
-        messageDiv.appendChild(avatarDiv);
-        messageDiv.appendChild(contentDiv);
+        // Assembla la bubble
+        bubbleDiv.appendChild(headerDiv);
+        bubbleDiv.appendChild(textDiv);
         
         // ♟️ Aggiungi elemento personalizzato se fornito (come la scacchiera)
         if (customElement) {
-            contentDiv.appendChild(customElement);
+            textDiv.appendChild(customElement);
         }
         
+        // Assembla il messaggio
+        messageDiv.appendChild(avatarDiv);
+        messageDiv.appendChild(bubbleDiv);
+        
+        // Aggiungi l'animazione di entrata
+        messageDiv.style.opacity = '0';
+        messageDiv.style.transform = 'translateY(20px)';
+        
         this.chatMessages.appendChild(messageDiv);
+        
+        // Anima l'entrata del messaggio
+        requestAnimationFrame(() => {
+            messageDiv.style.transition = 'all 0.5s ease-out';
+            messageDiv.style.opacity = '1';
+            messageDiv.style.transform = 'translateY(0)';
+        });
+        
         this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
         console.log('✅ Messaggio aggiunto alla chat');
+    }
+    
+    // Formatta messaggi base con markdown semplice
+    formatBasicMessage(message) {
+        // Formatta emoji e testo base
+        let formatted = message;
+        
+        // Bold text
+        formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        
+        // Italic text  
+        formatted = formatted.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        
+        // Line breaks
+        formatted = formatted.replace(/\n/g, '<br>');
+        
+        return formatted;
     }
     
     // 🎵 Formatta messaggi per modalità musica
@@ -2062,7 +2375,14 @@ alert("La somma è: " + somma);
     updateMemoryStatus() {
         if (this.memoryStatus) {
             const totalMessages = this.conversationHistory.length;
-            this.memoryStatus.textContent = `Memoria: ${totalMessages}/${this.maxHistoryLength} messaggi`;
+            const memoryCountElement = this.memoryStatus.querySelector('.memory-count');
+            
+            if (memoryCountElement) {
+                memoryCountElement.textContent = `${totalMessages}/${this.maxHistoryLength}`;
+            } else {
+                // Fallback per compatibilità
+                this.memoryStatus.textContent = `Memoria: ${totalMessages}/${this.maxHistoryLength} messaggi`;
+            }
         }
     }
     
@@ -2071,465 +2391,6 @@ alert("La somma è: " + somma);
             this.searchStatus.textContent = this.searchEnabled ? 'Ricerca: Attiva' : 'Ricerca: Disattivata';
             this.searchStatus.style.color = this.searchEnabled ? 'green' : 'orange';
         }
-    }
-      shouldUseSearch(message) {
-        return this.shouldTriggerSearch(message);
-    }
-      async performSearch(query) {
-        console.log('🔍 Avvio ricerca web per:', query);
-        
-        try {
-            const searchResults = await this.searchWeb(query);
-            return this.formatSearchResults(searchResults);
-        } catch (error) {
-            console.error('❌ Errore durante la ricerca:', error);
-            return `❌ **Errore Ricerca**\n\nNon sono riuscito a completare la ricerca per: "${query}"\n\n**Errore:** ${error.message}`;
-        }
-    }
-
-    // 🌐 SISTEMA RICERCA WEB AVANZATO
-    async searchWeb(query) {
-        console.log('🌐 Ricerca web avviata:', query);
-        
-        if (!AI_CONFIG?.search?.enabled) {
-            throw new Error('Ricerca web disabilitata nella configurazione');
-        }
-
-        const providers = AI_CONFIG.search.providers;
-        const maxResults = AI_CONFIG.search.maxResults || 5;
-        const timeout = AI_CONFIG.search.timeout || 15000;
-        
-        // Array per raccogliere risultati da tutti i provider
-        const allResults = [];
-        const searchPromises = [];
-
-        // Cerca in parallelo con tutti i provider abilitati
-        for (const [providerName, config] of Object.entries(providers)) {
-            if (config.enabled) {
-                console.log(`🔍 Avvio ricerca su ${config.name}...`);
-                
-                const searchPromise = this.searchWithTimeout(
-                    this.getSearchFunction(providerName),
-                    query,
-                    config,
-                    timeout
-                ).then(results => ({
-                    provider: providerName,
-                    results: results || [],
-                    success: true
-                })).catch(error => ({
-                    provider: providerName,
-                    results: [],
-                    success: false,
-                    error: error.message
-                }));
-                
-                searchPromises.push(searchPromise);
-            }
-        }
-
-        // Attendi tutti i risultati
-        const providerResults = await Promise.all(searchPromises);
-        
-        // Raccogli tutti i risultati validi
-        for (const result of providerResults) {
-            if (result.success && result.results.length > 0) {
-                console.log(`✅ ${result.provider}: ${result.results.length} risultati`);
-                allResults.push(...result.results.map(r => ({
-                    ...r,
-                    provider: result.provider
-                })));
-            } else if (!result.success) {
-                console.warn(`⚠️ ${result.provider} fallito:`, result.error);
-            }
-        }
-
-        // Deduplica e ordina i risultati
-        const uniqueResults = this.deduplicateResults(allResults);
-        const sortedResults = uniqueResults
-            .sort((a, b) => (b.relevance || 0) - (a.relevance || 0))
-            .slice(0, maxResults);
-
-        console.log(`✅ Ricerca completata: ${sortedResults.length} risultati finali`);
-        
-        return {
-            query: query,
-            results: sortedResults,
-            totalFound: allResults.length,
-            providers: providerResults.filter(r => r.success).map(r => r.provider),
-            timestamp: new Date().toISOString()
-        };
-    }
-
-    // Wrapper per timeout delle ricerche
-    async searchWithTimeout(searchFunction, query, config, timeout) {
-        return Promise.race([
-            searchFunction(query, config),
-            new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('Timeout ricerca')), timeout)
-            )
-        ]);
-    }
-
-    // Restituisce la funzione di ricerca appropriata per il provider
-    getSearchFunction(providerName) {
-        const searchFunctions = {
-            'duckduckgo': this.searchDuckDuckGo.bind(this),
-            'wikipedia': this.searchWikipedia.bind(this),
-            'wikidata': this.searchWikidata.bind(this),
-            'github': this.searchGitHub.bind(this)
-        };
-        
-        return searchFunctions[providerName] || (() => Promise.resolve([]));
-    }
-
-    // 🦆 RICERCA DUCKDUCKGO
-    async searchDuckDuckGo(query, config) {
-        console.log('🦆 Ricerca DuckDuckGo:', query);
-        
-        try {
-            const url = `${config.url}?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1`;
-            
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-
-            const data = await response.json();
-            const results = [];
-
-            // Instant Answer
-            if (data.Abstract) {
-                results.push({
-                    title: data.Heading || 'Risposta Istantanea',
-                    snippet: data.Abstract,
-                    url: data.AbstractURL || '#',
-                    type: 'instant_answer',
-                    relevance: 10,
-                    source: data.AbstractSource || 'DuckDuckGo'
-                });
-            }
-
-            // Definition
-            if (data.Definition) {
-                results.push({
-                    title: 'Definizione',
-                    snippet: data.Definition,
-                    url: data.DefinitionURL || '#',
-                    type: 'definition',
-                    relevance: 9,
-                    source: data.DefinitionSource || 'DuckDuckGo'
-                });
-            }
-
-            // Related Topics
-            if (data.RelatedTopics && data.RelatedTopics.length > 0) {
-                data.RelatedTopics.slice(0, 3).forEach((topic, index) => {
-                    if (topic.Text && topic.FirstURL) {
-                        results.push({
-                            title: topic.Text.split(' - ')[0] || 'Argomento Correlato',
-                            snippet: topic.Text,
-                            url: topic.FirstURL,
-                            type: 'related',
-                            relevance: 7 - index,
-                            source: 'DuckDuckGo'
-                        });
-                    }
-                });
-            }
-
-            console.log(`🦆 DuckDuckGo: ${results.length} risultati trovati`);
-            return results;
-
-        } catch (error) {
-            console.error('❌ Errore DuckDuckGo:', error);
-            return [];
-        }
-    }
-
-    // 📚 RICERCA WIKIPEDIA
-    async searchWikipedia(query, config) {
-        console.log('📚 Ricerca Wikipedia:', query);
-        
-        try {
-            // Prima cerca le pagine
-            const searchUrl = `${config.url}page/search/${encodeURIComponent(query)}?limit=3`;
-            
-            const searchResponse = await fetch(searchUrl, {
-                headers: {
-                    'Accept': 'application/json',
-                    'User-Agent': 'AmicovirtualeAI/1.0'
-                }
-            });
-
-            if (!searchResponse.ok) {
-                throw new Error(`HTTP ${searchResponse.status}`);
-            }
-
-            const searchData = await searchResponse.json();
-            const results = [];
-
-            if (searchData.pages && searchData.pages.length > 0) {
-                // Per ogni pagina trovata, ottieni il riassunto
-                for (const page of searchData.pages.slice(0, 2)) {
-                    try {
-                        const summaryUrl = `${config.url}page/summary/${encodeURIComponent(page.key)}`;
-                        const summaryResponse = await fetch(summaryUrl, {
-                            headers: {
-                                'Accept': 'application/json',
-                                'User-Agent': 'AmicovirtualeAI/1.0'
-                            }
-                        });
-
-                        if (summaryResponse.ok) {
-                            const summaryData = await summaryResponse.json();
-                            results.push({
-                                title: summaryData.title || page.title,
-                                snippet: summaryData.extract || page.description || 'Nessuna descrizione disponibile',
-                                url: summaryData.content_urls?.desktop?.page || `https://it.wikipedia.org/wiki/${page.key}`,
-                                type: 'encyclopedia',
-                                relevance: 8,
-                                source: 'Wikipedia',
-                                thumbnail: summaryData.thumbnail?.source
-                            });
-                        }
-                    } catch (error) {
-                        console.warn('⚠️ Errore nel recupero riassunto Wikipedia:', error);
-                    }
-                }
-            }
-
-            console.log(`📚 Wikipedia: ${results.length} risultati trovati`);
-            return results;
-
-        } catch (error) {
-            console.error('❌ Errore Wikipedia:', error);
-            return [];
-        }
-    }
-
-    // 🗃️ RICERCA WIKIDATA
-    async searchWikidata(query, config) {
-        console.log('🗃️ Ricerca Wikidata:', query);
-        
-        try {
-            // Query SPARQL per cercare entità
-            const sparqlQuery = `
-                SELECT DISTINCT ?item ?itemLabel ?itemDescription WHERE {
-                    ?item rdfs:label ?label .
-                    FILTER(CONTAINS(LCASE(?label), LCASE("${query.replace(/"/g, '\\"')}")))
-                    SERVICE wikibase:label { bd:serviceParam wikibase:language "it,en". }
-                }
-                LIMIT 3
-            `;
-
-            const url = `${config.url}?query=${encodeURIComponent(sparqlQuery)}&format=json`;
-            
-            const response = await fetch(url, {
-                headers: {
-                    'Accept': 'application/sparql-results+json',
-                    'User-Agent': 'AmicovirtualeAI/1.0'
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-
-            const data = await response.json();
-            const results = [];
-
-            if (data.results && data.results.bindings) {
-                data.results.bindings.forEach((binding, index) => {
-                    const item = binding.item?.value;
-                    const label = binding.itemLabel?.value;
-                    const description = binding.itemDescription?.value;
-
-                    if (item && label) {
-                        const entityId = item.split('/').pop();
-                        results.push({
-                            title: label,
-                            snippet: description || 'Entità Wikidata',
-                            url: `https://www.wikidata.org/wiki/${entityId}`,
-                            type: 'data',
-                            relevance: 6 - index,
-                            source: 'Wikidata',
-                            entityId: entityId
-                        });
-                    }
-                });
-            }
-
-            console.log(`🗃️ Wikidata: ${results.length} risultati trovati`);
-            return results;
-
-        } catch (error) {
-            console.error('❌ Errore Wikidata:', error);
-            return [];
-        }
-    }
-
-    // 💻 RICERCA GITHUB (specifica per programmazione)
-    async searchGitHub(query, config) {
-        console.log('💻 Ricerca GitHub:', query);
-        
-        try {
-            // Determina il tipo di ricerca più appropriato
-            let searchType = 'repositories';
-            let searchQuery = query;
-
-            // Se la query contiene termini di programmazione, cerca repository
-            const codeTerms = ['javascript', 'python', 'react', 'vue', 'angular', 'node', 'api', 'library', 'framework'];
-            const hasCodeTerms = codeTerms.some(term => query.toLowerCase().includes(term));
-
-            if (hasCodeTerms) {
-                searchQuery += ' language:javascript OR language:python OR language:typescript';
-            }
-
-            const url = `${config.url}search/${searchType}?q=${encodeURIComponent(searchQuery)}&sort=stars&order=desc&per_page=3`;
-            
-            const response = await fetch(url, {
-                headers: {
-                    'Accept': 'application/vnd.github.v3+json',
-                    'User-Agent': 'AmicovirtualeAI/1.0'
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-
-            const data = await response.json();
-            const results = [];
-
-            if (data.items && data.items.length > 0) {
-                data.items.forEach((item, index) => {
-                    results.push({
-                        title: item.full_name || item.name,
-                        snippet: item.description || 'Repository GitHub',
-                        url: item.html_url,
-                        type: 'code',
-                        relevance: 7 - index,
-                        source: 'GitHub',
-                        stars: item.stargazers_count,
-                        language: item.language,
-                        updated: item.updated_at
-                    });
-                });
-            }
-
-            console.log(`💻 GitHub: ${results.length} risultati trovati`);
-            return results;
-
-        } catch (error) {
-            console.error('❌ Errore GitHub:', error);
-            return [];
-        }
-    }
-
-    // 🔄 DEDUPLICAZIONE RISULTATI
-    deduplicateResults(results) {
-        const seen = new Set();
-        const unique = [];
-
-        for (const result of results) {
-            // Crea una chiave unica basata su titolo e URL
-            const key = `${result.title?.toLowerCase()}_${result.url}`;
-            
-            if (!seen.has(key)) {
-                seen.add(key);
-                unique.push(result);
-            }
-        }
-
-        console.log(`🔄 Deduplicazione: ${results.length} → ${unique.length} risultati`);
-        return unique;
-    }
-
-    // 📋 FORMATTAZIONE RISULTATI PER DISPLAY
-    formatSearchResults(searchData) {
-        if (!searchData.results || searchData.results.length === 0) {
-            return `🔍 **Nessun risultato trovato**\n\nNon ho trovato informazioni per: "${searchData.query}"`;
-        }
-
-        let formatted = `🌐 **Risultati Ricerca:** "${searchData.query}"\n\n`;
-        formatted += `📊 **${searchData.results.length} risultati** da ${searchData.providers.join(', ')}\n\n`;
-
-        searchData.results.forEach((result, index) => {
-            const emoji = this.getResultEmoji(result.type);
-            const providerBadge = this.getProviderBadge(result.provider);
-            
-            formatted += `${emoji} **${result.title}**\n`;
-            formatted += `${result.snippet}\n`;
-            formatted += `🔗 <a href="${result.url}" target="_blank">Leggi di più</a> ${providerBadge}`;
-            
-            if (result.stars) {
-                formatted += ` ⭐ ${result.stars}`;
-            }
-            
-            if (result.language) {
-                formatted += ` 💻 ${result.language}`;
-            }
-            
-            formatted += '\n\n';
-        });
-
-        formatted += `⏰ *Ricerca completata: ${new Date().toLocaleTimeString('it-IT')}*`;
-        
-        return formatted;
-    }
-
-    // 📎 UTILITY PER FORMATTAZIONE
-    getResultEmoji(type) {
-        const emojis = {
-            'instant_answer': '⚡',
-            'definition': '📖',
-            'encyclopedia': '📚',
-            'related': '🔗',
-            'data': '🗃️',
-            'code': '💻',
-            'default': '🌐'
-        };
-        return emojis[type] || emojis.default;
-    }
-
-    getProviderBadge(provider) {
-        const badges = {
-            'duckduckgo': '🦆',
-            'wikipedia': '📚',
-            'wikidata': '🗃️',
-            'github': '💻'
-        };
-        return badges[provider] || '🌐';
-    }
-
-    // 🎯 TRIGGER AUTOMATICO RICERCA
-    shouldTriggerSearch(message) {
-        if (!AI_CONFIG?.search?.enabled) return false;
-
-        const triggers = AI_CONFIG.search.triggers || [];
-        const linkTriggers = AI_CONFIG.search.linkTriggers || [];
-        
-        // Verifica trigger di ricerca
-        const hasSearchTrigger = triggers.some(trigger => 
-            message.toLowerCase().includes(trigger.toLowerCase())
-        );
-        
-        // Verifica trigger di link
-        const hasLinkTrigger = linkTriggers.some(trigger => 
-            message.toLowerCase().includes(trigger.toLowerCase())
-        );
-
-        // Modalità ricercatore ha priorità più alta
-        const isResearchMode = this.currentCategory === 'ricercatore';
-        
-        return hasSearchTrigger || hasLinkTrigger || isResearchMode;
     }
       // Metodo per creare indicatore di debug visuale
     createDebugIndicator() {
@@ -2653,491 +2514,76 @@ alert("La somma è: " + somma);
         }
     }
     
-    // Metodi placeholder per completezza
-    analyzeCode(code) {
-        return `🔍 **Analisi Codice:**\n\nCodice da analizzare:\n\`\`\`\n${code}\n\`\`\`\n\n✅ Analisi completata! Il codice sembra funzionare correttamente.`;
-    }
-    
-    reviewCode(code) {
-        return `📝 **Revisione Codice:**\n\nCodice sotto revisione:\n\`\`\`\n${code}\n\`\`\`\n\n✅ Revisione completata! Suggerimenti di miglioramento disponibili.`;
-    }
-    
-    debugCode(code) {
-        return `🐛 **Debug Codice:**\n\nCodice da debuggare:\n\`\`\`\n${code}\n\`\`\`\n\n🔧 Possibili problemi identificati e soluzioni proposte.`;
-    }
-    
-    optimizeCode(code) {
-        return `⚡ **Ottimizzazione Codice:**\n\nCodice da ottimizzare:\n\`\`\`\n${code}\n\`\`\`\n\n🚀 Suggerimenti per migliorare le performance.`;
-    }
-    
-    explainCode(code) {
-        return `📚 **Spiegazione Codice:**\n\nCodice da spiegare:\n\`\`\`\n${code}\n\`\`\`\n\n💡 Spiegazione dettagliata del funzionamento.`;
-    }
-    
-    getDesignPatterns(language) {
-        return `🎨 **Design Patterns per ${language || 'Generico'}:**\n\n• **Singleton** - Una sola istanza\n• **Factory** - Creazione oggetti\n• **Observer** - Notifiche eventi\n• **Strategy** - Algoritmi intercambiabili\n\n📖 Pattern utili per strutturare il codice.`;
-    }
-    
-    getCodeMetrics(code) {
-        if (!code) {
-            return `📊 **Metriche Codice:**\n\nInserisci del codice per analizzare le metriche.`;
-        }
+    // 🎨 Inizializza stili per il player YouTube
+    initializeYouTubePlayerStyles() {
+        // Controlla se gli stili sono già stati aggiunti
+        if (document.getElementById('youtube-player-styles')) return;
         
-        const lines = code.split('\n').length;
-        const chars = code.length;
-        const words = code.split(/\s+/).length;
-        
-        return `📊 **Metriche Codice:**\n\n• **Linee:** ${lines}\n• **Caratteri:** ${chars}\n• **Parole:** ${words}\n• **Complessità:** Media\n\n📈 Codice ben strutturato!`;
-    }
-    
-    getBestPractices(language) {
-        const practices = {
-            javascript: `✅ **Best Practices JavaScript:**\n\n• Usa const/let invece di var\n• Naming convensions camelCase\n• Gestisci gli errori con try/catch\n• Commenta il codice complesso\n• Usa arrow functions quando appropriato`,
-            python: `✅ **Best Practices Python:**\n\n• Segui PEP 8 per lo stile\n• Usa nomi descrittivi\n• Scrivi docstring\n• Gestisci le eccezioni\n• Usa type hints quando possibile`,
-            default: `✅ **Best Practices Generali:**\n\n• Codice pulito e leggibile\n• Commenti utili\n• Test unitari\n• Gestione errori\n• Documentazione`
-        };
-        
-        return practices[language?.toLowerCase()] || practices.default;
-    }
-    
-    getResources(language) {
-        const resources = {
-            javascript: `📚 **Risorse JavaScript:**\n\n• [MDN Web Docs](https://developer.mozilla.org/)\n• [JavaScript.info](https://javascript.info/)\n• [Node.js Docs](https://nodejs.org/docs/)\n• [Vue.js Guide](https://vuejs.org/guide/)\n• [React Documentation](https://react.dev/)`,
-            python: `📚 **Risorse Python:**\n\n• [Python.org](https://python.org/)\n• [Python Docs](https://docs.python.org/)\n• [Real Python](https://realpython.com/)\n• [PyPI](https://pypi.org/)\n• [Django Docs](https://docs.djangoproject.com/)`,
-            default: `📚 **Risorse Generali:**\n\n• [Stack Overflow](https://stackoverflow.com/)\n• [GitHub](https://github.com/)\n• [Developer Mozilla](https://developer.mozilla.org/)\n• [W3Schools](https://w3schools.com/)\n• [FreeCodeCamp](https://freecodecamp.org/)`
-        };          return resources[language?.toLowerCase()] || resources.default;
-    }
-
-    // ♟️ =========================
-    // SISTEMA SCACCHI INTERATTIVI
-    // ♟️ =========================
-    
-    // Inizializza scacchiera con posizione iniziale
-    initializeChessBoard() {
-        const board = Array(8).fill(null).map(() => Array(8).fill(null));
-        
-        // Pezzi neri (riga 0 e 1)
-        board[0] = [
-            {type: 'rook', color: 'black'}, {type: 'knight', color: 'black'}, 
-            {type: 'bishop', color: 'black'}, {type: 'queen', color: 'black'},
-            {type: 'king', color: 'black'}, {type: 'bishop', color: 'black'}, 
-            {type: 'knight', color: 'black'}, {type: 'rook', color: 'black'}
-        ];
-        board[1] = Array(8).fill({type: 'pawn', color: 'black'});
-        
-        // Pezzi bianchi (riga 6 e 7)
-        board[6] = Array(8).fill({type: 'pawn', color: 'white'});
-        board[7] = [
-            {type: 'rook', color: 'white'}, {type: 'knight', color: 'white'}, 
-            {type: 'bishop', color: 'white'}, {type: 'queen', color: 'white'},
-            {type: 'king', color: 'white'}, {type: 'bishop', color: 'white'}, 
-            {type: 'knight', color: 'white'}, {type: 'rook', color: 'white'}
-        ];
-        
-        return board;
-    }
-    
-    // Ottieni il simbolo Unicode per il pezzo
-    getPieceSymbol(piece) {
-        if (!piece) return '';
-        
-        const symbols = {
-            white: { king: '♔', queen: '♕', rook: '♖', bishop: '♗', knight: '♘', pawn: '♙' },
-            black: { king: '♚', queen: '♛', rook: '♜', bishop: '♝', knight: '♞', pawn: '♟' }
-        };
-        
-        return symbols[piece.color][piece.type] || '';
-    }
-    
-    // Avvia una nuova partita di scacchi
-    startChessGame() {
-        console.log('♟️ Avvio partita a scacchi...');
-        
-        this.chessGame = {
-            active: true,
-            board: this.initializeChessBoard(),
-            turn: 'white',
-            selectedSquare: null,
-            moveHistory: [],
-            gameId: Date.now().toString()
-        };
-        
-        const chessBoard = this.createChessBoardElement();
-        this.addChatMessage('♟️ **Partita a Scacchi Iniziata!**\n\nSei i pezzi bianchi e inizi tu. Clicca su un pezzo per selezionarlo, poi clicca dove vuoi muoverlo.\n\n*Buona fortuna!* 🍀', 'ai', chessBoard);
-    }
-      // Crea l'elemento HTML della scacchiera
-    createChessBoardElement() {
-        const boardContainer = document.createElement('div');
-        boardContainer.className = 'chess-game-container';
-        boardContainer.innerHTML = `
-            <div class="chess-main-area">
-                <div class="chess-board-section">
-                    <div class="chess-status">
-                        <span class="turn-indicator">Turno: ${this.chessGame.turn === 'white' ? '⚪ Bianco (Tu)' : '⚫ Nero (AI)'}</span>
-                        <button class="chess-surrender-btn" onclick="if(window.vf) window.vf.surrenderChess()">🏳️ Arrenditi</button>
-                    </div>
-                    <div class="chess-board-grid"></div>
-                </div>
+        const styles = document.createElement('style');
+        styles.id = 'youtube-player-styles';
+        styles.textContent = `
+            /* Animazioni per notifiche */
+            @keyframes slideInNotification {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOutNotification {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            
+            /* Animazioni per player YouTube */
+            .youtube-player-container:hover .play-overlay {
+                background: rgba(0,0,0,0.6) !important;
+            }
+            
+            .youtube-player-container:hover .play-button {
+                transform: scale(1.1);
+                box-shadow: 0 6px 20px rgba(255,0,0,0.6) !important;
+            }
+            
+            /* Responsive design per player */
+            @media (max-width: 480px) {
+                .youtube-player-container {
+                    max-width: 100% !important;
+                    margin: 10px 0 !important;
+                }
                 
-                <div class="chess-moves-panel">
-                    <div class="chess-moves-header">
-                        <span class="moves-title">📋 Mosse</span>
-                        <button class="moves-toggle-btn" onclick="this.parentElement.parentElement.classList.toggle('collapsed')">
-                            <span class="toggle-icon">▼</span>
-                        </button>
-                    </div>
-                    <div class="chess-moves-content">
-                        <div class="moves-list-container">
-                            <div class="moves-history" id="chess-moves-history-${this.chessGame.gameId}">
-                                ${this.chessGame.moveHistory.length === 0 ? 
-                                    '<div class="no-moves">Nessuna mossa ancora</div>' : 
-                                    this.formatMovesHistory()
-                                }
-                            </div>
-                        </div>
-                        <div class="ai-move-notification" id="ai-notification-${this.chessGame.gameId}" style="display: none;">
-                            <div class="ai-move-content"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                .youtube-player {
+                    height: 200px !important;
+                }
+            }
+            
+            /* Animazione loading per player */
+            .youtube-player.loading::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 40px;
+                height: 40px;
+                margin: -20px 0 0 -20px;
+                border: 3px solid rgba(255,255,255,0.3);
+                border-top: 3px solid #ff0000;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+            
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            
+            /* Stili per fallback player */
+            .fallback-video-player:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 12px 35px rgba(0,0,0,0.4);
+            }
         `;
         
-        const grid = boardContainer.querySelector('.chess-board-grid');
-        
-        for (let row = 0; row < 8; row++) {
-            for (let col = 0; col < 8; col++) {
-                const square = document.createElement('div');
-                square.className = `chess-square ${(row + col) % 2 === 0 ? 'light' : 'dark'}`;
-                square.dataset.row = row;
-                square.dataset.col = col;
-                
-                const piece = this.chessGame.board[row][col];
-                if (piece) {
-                    square.innerHTML = `<span class="chess-piece">${this.getPieceSymbol(piece)}</span>`;
-                    square.classList.add(`piece-${piece.color}`);
-                }
-                
-                square.addEventListener('click', () => this.handleSquareClick(row, col));
-                grid.appendChild(square);
-            }
-        }
-        
-        return boardContainer;
-    }
-    
-    // Gestisce il click su una casella
-    handleSquareClick(row, col) {
-        if (!this.chessGame.active) return;
-        
-        console.log(`♟️ Click su casella: ${row},${col}`);
-        
-        const piece = this.chessGame.board[row][col];
-        
-        if (this.chessGame.selectedSquare) {
-            const {row: fromRow, col: fromCol} = this.chessGame.selectedSquare;
-            
-            // Prova a fare la mossa
-            if (this.isValidMove(fromRow, fromCol, row, col)) {
-                this.makeMove(fromRow, fromCol, row, col);
-            } else {
-                // Selezione di un nuovo pezzo o deseleziona
-                if (piece && piece.color === this.chessGame.turn) {
-                    this.chessGame.selectedSquare = {row, col};
-                } else {
-                    this.chessGame.selectedSquare = null;
-                }
-                this.updateChessBoard();
-            }
-        } else {
-            // Selezione iniziale
-            if (piece && piece.color === this.chessGame.turn) {
-                this.chessGame.selectedSquare = {row, col};
-                this.updateChessBoard();
-            }
-        }
-    }
-    
-    // Verifica se la mossa è valida (versione semplificata)
-    isValidMove(fromRow, fromCol, toRow, toCol) {
-        if (fromRow < 0 || fromRow > 7 || fromCol < 0 || fromCol > 7 ||
-            toRow < 0 || toRow > 7 || toCol < 0 || toCol > 7) {
-            return false;
-        }
-        
-        const piece = this.chessGame.board[fromRow][fromCol];
-        const targetPiece = this.chessGame.board[toRow][toCol];
-        
-        if (!piece || piece.color !== this.chessGame.turn) return false;
-        if (targetPiece && targetPiece.color === piece.color) return false;
-        
-        // Validazione base per tipo di pezzo
-        const rowDiff = Math.abs(toRow - fromRow);
-        const colDiff = Math.abs(toCol - fromCol);
-        
-        switch (piece.type) {
-            case 'pawn':
-                const direction = piece.color === 'white' ? -1 : 1;
-                const startRow = piece.color === 'white' ? 6 : 1;
-                
-                if (fromCol === toCol && !targetPiece) {
-                    if (toRow === fromRow + direction) return true;
-                    if (fromRow === startRow && toRow === fromRow + 2 * direction) return true;
-                }
-                if (Math.abs(toCol - fromCol) === 1 && toRow === fromRow + direction && targetPiece) {
-                    return true;
-                }
-                break;
-                
-            case 'rook':
-                return (fromRow === toRow || fromCol === toCol) && this.isPathClear(fromRow, fromCol, toRow, toCol);
-                
-            case 'bishop':
-                return rowDiff === colDiff && this.isPathClear(fromRow, fromCol, toRow, toCol);
-                
-            case 'queen':
-                return ((fromRow === toRow || fromCol === toCol) || rowDiff === colDiff) && 
-                       this.isPathClear(fromRow, fromCol, toRow, toCol);
-                       
-            case 'king':
-                return rowDiff <= 1 && colDiff <= 1;
-                
-            case 'knight':
-                return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
-        }
-        
-        return false;
-    }
-    
-    // Verifica se il percorso è libero
-    isPathClear(fromRow, fromCol, toRow, toCol) {
-        const rowStep = toRow === fromRow ? 0 : (toRow > fromRow ? 1 : -1);
-        const colStep = toCol === fromCol ? 0 : (toCol > fromCol ? 1 : -1);
-        
-        let currentRow = fromRow + rowStep;
-        let currentCol = fromCol + colStep;
-        
-        while (currentRow !== toRow || currentCol !== toCol) {
-            if (this.chessGame.board[currentRow][currentCol]) return false;
-            currentRow += rowStep;
-            currentCol += colStep;
-        }
-        
-        return true;
-    }
-    
-    // Esegue una mossa
-    makeMove(fromRow, fromCol, toRow, toCol) {
-        const piece = this.chessGame.board[fromRow][fromCol];
-        const captured = this.chessGame.board[toRow][toCol];
-        
-        // Esegui la mossa
-        this.chessGame.board[toRow][toCol] = piece;
-        this.chessGame.board[fromRow][fromCol] = null;
-        this.chessGame.selectedSquare = null;
-        
-        // Registra la mossa
-        const moveNotation = this.formatMove(fromRow, fromCol, toRow, toCol, piece, !!captured);
-        this.chessGame.moveHistory.push(moveNotation);
-        
-        console.log('♟️ Mossa giocatore:', moveNotation);
-          // Aggiorna la scacchiera e il pannello delle mosse
-        this.updateChessBoard();
-        this.updateMovesPanel();
-        
-        // Cambia turno e fai giocare l'AI
-        this.chessGame.turn = 'black';
-        setTimeout(() => this.makeAIMove(), 1000);
-    }
-    
-    // Formatta la mossa in notazione scacchistica semplificata
-    formatMove(fromRow, fromCol, toRow, toCol, piece, captured) {
-        const files = 'abcdefgh';
-        const ranks = '87654321';
-        
-        const fromSquare = files[fromCol] + ranks[fromRow];
-        const toSquare = files[toCol] + ranks[toRow];
-        
-        return `${this.getPieceSymbol(piece)}${fromSquare}${captured ? 'x' : '-'}${toSquare}`;
-    }
-    
-    // AI fa una mossa casuale
-    makeAIMove() {
-        const possibleMoves = this.getAllPossibleMoves('black');
-        
-        if (possibleMoves.length === 0) {
-            this.addChatMessage('♟️ **Partita Terminata!**\n\nHai vinto! Non posso più muovere. Congratulazioni! 🎉', 'ai');
-            this.chessGame.active = false;
-            return;
-        }
-        
-        const randomMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
-        const {fromRow, fromCol, toRow, toCol} = randomMove;
-        
-        const piece = this.chessGame.board[fromRow][fromCol];
-        const captured = this.chessGame.board[toRow][toCol];
-        
-        // Esegui la mossa AI
-        this.chessGame.board[toRow][toCol] = piece;
-        this.chessGame.board[fromRow][fromCol] = null;
-          const moveNotation = this.formatMove(fromRow, fromCol, toRow, toCol, piece, !!captured);
-        this.chessGame.moveHistory.push(moveNotation);
-        
-        console.log('♟️ Mossa AI:', moveNotation);
-        
-        // Notifica la mossa nel pannello laterale invece che nella chat
-        const files = 'abcdefgh';
-        const ranks = '87654321';
-        const fromSquare = files[fromCol] + ranks[fromRow];
-        const toSquare = files[toCol] + ranks[toRow];
-        
-        const moveMessage = `🤖 ${this.getPieceSymbol(piece)} ${fromSquare} → ${toSquare}${captured ? ' (cattura!)' : ''}`;
-        this.showAIMoveNotification(moveMessage);
-        
-        // Cambia turno
-        this.chessGame.turn = 'white';
-        this.updateChessBoard();
-        this.updateMovesPanel();
-    }
-    
-    // Ottieni tutte le mosse possibili per un colore
-    getAllPossibleMoves(color) {
-        const moves = [];
-        
-        for (let fromRow = 0; fromRow < 8; fromRow++) {
-            for (let fromCol = 0; fromCol < 8; fromCol++) {
-                const piece = this.chessGame.board[fromRow][fromCol];
-                if (piece && piece.color === color) {
-                    for (let toRow = 0; toRow < 8; toRow++) {
-                        for (let toCol = 0; toCol < 8; toCol++) {
-                            if (this.isValidMove(fromRow, fromCol, toRow, toCol)) {
-                                moves.push({fromRow, fromCol, toRow, toCol});
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-        return moves;
-    }    // Aggiorna la visualizzazione della scacchiera
-    updateChessBoard() {
-        console.log('🔄 Aggiornamento scacchiera...');
-        const chessBoardElements = document.querySelectorAll('.chess-game-container');
-        if (chessBoardElements.length === 0) {
-            console.log('❌ Nessuna scacchiera trovata!');
-            return;
-        }
-        
-        const latestBoard = chessBoardElements[chessBoardElements.length - 1];
-        console.log('✅ Scacchiera trovata, aggiornamento in corso...');
-        
-        // Aggiorna status
-        const turnIndicator = latestBoard.querySelector('.turn-indicator');
-        if (turnIndicator) {
-            turnIndicator.textContent = `Turno: ${this.chessGame.turn === 'white' ? '⚪ Bianco (Tu)' : '⚫ Nero (AI)'}`;
-        }
-        
-        // Aggiorna history
-        const movesList = latestBoard.querySelector('.moves-list');
-        if (movesList) {
-            movesList.textContent = this.chessGame.moveHistory.join(', ');
-        }
-          // Aggiorna griglia
-        const squares = latestBoard.querySelectorAll('.chess-square');
-        console.log(`🔄 Aggiornamento ${squares.length} caselle...`);
-        
-        squares.forEach((square, index) => {
-            const row = Math.floor(index / 8);
-            const col = index % 8;
-            const piece = this.chessGame.board[row][col];
-            
-            // Reset classi
-            square.className = `chess-square ${(row + col) % 2 === 0 ? 'light' : 'dark'}`;
-            
-            // Aggiungi pezzo
-            if (piece) {
-                const pieceSymbol = this.getPieceSymbol(piece);
-                square.innerHTML = `<span class="chess-piece">${pieceSymbol}</span>`;
-                square.classList.add(`piece-${piece.color}`);
-                // console.log(`♟️ Pezzo in ${row},${col}: ${pieceSymbol}`);
-            } else {
-                square.innerHTML = '';
-            }
-            
-            // Evidenzia selezione
-            if (this.chessGame.selectedSquare && 
-                this.chessGame.selectedSquare.row === row && 
-                this.chessGame.selectedSquare.col === col) {
-                square.classList.add('selected');
-            }
-        });
-        
-        console.log('✅ Aggiornamento scacchiera completato!');
-    }
-    
-    // Arrenditi nella partita
-    surrenderChess() {
-        if (!this.chessGame.active) return;
-        
-        this.chessGame.active = false;
-        this.addChatMessage('🏳️ **Partita Terminata**\n\nTi sei arreso. Vuoi giocare un\'altra partita? Chiedimelo quando vuoi!', 'ai');
-    }
-    
-    // Formatta la cronologia delle mosse per la visualizzazione
-    formatMovesHistory() {
-        if (this.chessGame.moveHistory.length === 0) {
-            return '<div class="no-moves">Nessuna mossa ancora</div>';
-        }
-        
-        let html = '';
-        for (let i = 0; i < this.chessGame.moveHistory.length; i += 2) {
-            const moveNumber = Math.floor(i / 2) + 1;
-            const whiteMove = this.chessGame.moveHistory[i];
-            const blackMove = this.chessGame.moveHistory[i + 1] || '';
-            
-            html += `
-                <div class="move-pair">
-                    <span class="move-number">${moveNumber}.</span>
-                    <span class="white-move">${whiteMove}</span>
-                    ${blackMove ? `<span class="black-move">${blackMove}</span>` : ''}
-                </div>
-            `;
-        }
-        
-        return html;
-    }
-    
-    // Aggiorna il pannello delle mosse
-    updateMovesPanel() {
-        const movesHistory = document.getElementById(`chess-moves-history-${this.chessGame.gameId}`);
-        if (movesHistory) {
-            movesHistory.innerHTML = this.formatMovesHistory();
-            
-            // Scroll automatico verso il basso
-            const movesContainer = movesHistory.parentElement;
-            movesContainer.scrollTop = movesContainer.scrollHeight;
-        }
-    }
-    
-    // Mostra notifica mossa AI nel pannello
-    showAIMoveNotification(message) {
-        const notification = document.getElementById(`ai-notification-${this.chessGame.gameId}`);
-        if (notification) {
-            const content = notification.querySelector('.ai-move-content');
-            content.textContent = message;
-            
-            notification.style.display = 'block';
-            notification.classList.add('show');
-            
-            // Nascondi automaticamente dopo 3 secondi
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => {
-                    notification.style.display = 'none';
-                }, 300);
-            }, 3000);
-        }
+        document.head.appendChild(styles);
+        console.log('🎨 Stili YouTube Player inizializzati');
     }
 }
 
