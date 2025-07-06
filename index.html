@@ -16,8 +16,119 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style-modern.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="has-background-dark">
+    <!-- 🎯 SPLASH SCREEN BENVENUTO -->
+    <div id="welcome-splash">
+        <div class="welcome-container">
+            <!-- Header benvenuto -->
+            <div class="welcome-header">
+                <div class="welcome-logo">🤖</div>
+                <h1 class="welcome-title">Benvenuto su Bittron AI</h1>
+                <p class="welcome-subtitle">Powered by Ollama & OpenAI</p>
+            </div>
+
+            <!-- Regolamento -->
+            <div class="welcome-rules">
+                <h3>📋 Regolamento d'uso</h3>
+                <div class="rules-content">
+                    <ul>
+                        <li>🎯 <strong>Rispetta il bot:</strong> Usa un linguaggio educato e costruttivo</li>
+                        <li>🔒 <strong>Privacy:</strong> Non condividere informazioni personali sensibili</li>
+                        <li>⚡ <strong>Feedback:</strong> Usa i pulsanti 👍👎 per migliorare le risposte</li>
+                        <li>🎭 <strong>Modalità:</strong> Ogni modalità ha funzionalità specifiche - scoprile!</li>
+                        <li>💾 <strong>Memoria:</strong> Il bot ricorda le conversazioni per modalità</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Selezione modalità -->
+            <div class="welcome-modes">
+                <h3>🎭 Scegli la tua modalità preferita</h3>
+                <div class="modes-grid">
+                    <div class="mode-card" data-mode="amico">
+                        <div class="mode-icon">😊</div>
+                        <h4>Amico</h4>
+                        <p>Conversazione, giochi e compagnia</p>
+                        <button class="discover-btn" data-mode="amico">🔍 Scopri le funzioni</button>
+                        <div class="mode-features hidden" id="features-amico">
+                            <h5>🎮 Cosa posso fare:</h5>
+                            <ul>
+                                <li>♟️ <strong>Scacchi interattivi:</strong> "Giochiamo a scacchi!"</li>
+                                <li>💬 <strong>Conversazione:</strong> Chiacchiere su qualsiasi argomento</li>
+                                <li>🎯 <strong>Giochi di parole:</strong> Indovinelli, quiz, barzellette</li>
+                                <li>📖 <strong>Storytelling:</strong> "Raccontami una storia"</li>
+                                <li>🤔 <strong>Consigli:</strong> Supporto emotivo e suggerimenti</li>
+                            </ul>
+                        </div>
+                        <button class="select-mode-btn" data-mode="amico">Inizia Chat</button>
+                    </div>
+
+                    <div class="mode-card" data-mode="musica">
+                        <div class="mode-icon">🎵</div>
+                        <h4>Musica</h4>
+                        <p>Scopri e ascolta la tua musica preferita</p>
+                        <button class="discover-btn" data-mode="musica">🔍 Scopri le funzioni</button>
+                        <div class="mode-features hidden" id="features-musica">
+                            <h5>🎶 Cosa posso fare:</h5>
+                            <ul>
+                                <li>🎧 <strong>Player YouTube:</strong> "Suona Bohemian Rhapsody"</li>
+                                <li>🔍 <strong>Ricerca brani:</strong> "Fammi sentire jazz rilassante"</li>
+                                <li>👨‍🎤 <strong>Info artisti:</strong> "Parlami dei Beatles"</li>
+                                <li>📊 <strong>Classifiche:</strong> "Top 10 hits del momento"</li>
+                                <li>🎹 <strong>Generi musicali:</strong> Rock, Pop, Jazz, Elettronica...</li>
+                            </ul>
+                        </div>
+                        <button class="select-mode-btn" data-mode="musica">Inizia Chat</button>
+                    </div>
+
+                    <div class="mode-card" data-mode="programmatore">
+                        <div class="mode-icon">💻</div>
+                        <h4>Programmatore</h4>
+                        <p>Assistenza tecnica e sviluppo software</p>
+                        <button class="discover-btn" data-mode="programmatore">🔍 Scopri le funzioni</button>
+                        <div class="mode-features hidden" id="features-programmatore">
+                            <h5>⚙️ Cosa posso fare:</h5>
+                            <ul>
+                                <li>📝 <strong>Generazione codice:</strong> "Crea una funzione JavaScript per..."</li>
+                                <li>🐛 <strong>Debug assistito:</strong> "Aiutami a correggere questo errore"</li>
+                                <li>📚 <strong>Spiegazioni:</strong> "Come funziona React?"</li>
+                                <li>🏗️ <strong>Architettura:</strong> "Progetta un database per..."</li>
+                                <li>🔧 <strong>Best practices:</strong> Consigli e ottimizzazioni</li>
+                            </ul>
+                        </div>
+                        <button class="select-mode-btn" data-mode="programmatore">Inizia Chat</button>
+                    </div>
+
+                    <div class="mode-card" data-mode="ricercatore">
+                        <div class="mode-icon">🔬</div>
+                        <h4>Ricercatore</h4>
+                        <p>Ricerca informazioni e analisi dati</p>
+                        <button class="discover-btn" data-mode="ricercatore">🔍 Scopri le funzioni</button>
+                        <div class="mode-features hidden" id="features-ricercatore">
+                            <h5>🔍 Cosa posso fare:</h5>
+                            <ul>
+                                <li>🌐 <strong>Ricerca web:</strong> "Cerca informazioni su..."</li>
+                                <li>📊 <strong>Analisi dati:</strong> "Analizza questi numeri"</li>
+                                <li>📰 <strong>Notizie aggiornate:</strong> "Ultime news su..."</li>
+                                <li>🎓 <strong>Ricerca accademica:</strong> Fonti affidabili e studi</li>
+                                <li>📈 <strong>Trend e statistiche:</strong> Dati di mercato e tendenze</li>
+                            </ul>
+                        </div>
+                        <button class="select-mode-btn" data-mode="ricercatore">Inizia Chat</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer info -->
+            <div class="welcome-footer">
+                <p>💡 <strong>Suggerimento:</strong> Puoi cambiare modalità in qualsiasi momento durante la chat!</p>
+                <p class="version-info">Versione 2.0 • Sistema di apprendimento continuo attivo</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Navigation Top Bar -->
     <nav class="navbar is-dark is-transparent navbar-futuristic" role="navigation">
         <div class="navbar-brand">
@@ -222,6 +333,11 @@
     </div>
 
     <script src="config.js"></script>
+    
+    <!-- Sistema di Apprendimento Continuo -->
+    <script src="learning-storage.js"></script>
+    <script src="learning-metrics.js"></script>
+    <script src="learning-system.js"></script>
     
     <!-- Moduli AI -->
     <script src="amico.js"></script>

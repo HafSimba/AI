@@ -24,6 +24,10 @@ class VirtualFriend {
         };
         this.previousCategory = null;
         
+        // 🧠 Sistema di apprendimento continuo
+        this.learningSystem = null;
+        this.learningEnabled = true;
+        
         // 🔍 Sistema ricerca online
         this.searchEnabled = false;
         try {
@@ -38,8 +42,26 @@ class VirtualFriend {
         this.initializeEventListeners();
         this.initializeInterface();
         
+        // 🧠 Inizializza sistema apprendimento
+        this.initializeLearningSystem();
+        
         // 🚀 Avvio sistema
         this.startSystem();
+        
+        // 🎯 Inizializza splash screen di benvenuto (alla fine)
+        setTimeout(() => {
+            this.initializeWelcomeSplash();
+            
+            // 🧪 Test per debug (rimuovere in produzione)
+            this.testSplashFunctionality();
+            
+            // Esponi istanza per debug
+            window.bittronAI = this;
+            window.debugBlockers = () => this.debugBlockingElements();
+            window.forceClean = () => this.forceRemoveBlockers();
+            console.log('🔧 Istanza esposta in window.bittronAI per debug');
+            console.log('🔧 Comandi debug: window.debugBlockers() e window.forceClean()');
+        }, 100);
     }
     
     // 🏗️ Inizializza elementi DOM
@@ -209,17 +231,15 @@ class VirtualFriend {
             initializeYouTubePlayerStyles();
         }
         
-        // 🎨 Inizializza sfondo tema di default
-        setTimeout(() => {
-            this.switchChatBackground(this.currentCategory);
-        }, 500);
+        // Non cambiare modalità automaticamente - lascia che l'utente scelga dal splash screen
+        // this.switchChatBackground(this.currentCategory);
         
-        this.updateDebugIndicator('✅ Sistema avviato');
-        console.log('✅ VirtualFriend inizializzato con successo');
+        this.updateDebugIndicator('✅ Sistema avviato - In attesa selezione modalità');
+        console.log('✅ VirtualFriend inizializzato - Splash screen attivo');
     }
     
     // 🔄 Cambia modalità AI
-    async changeMode(mode) {
+    async changeMode(mode, showWelcomeMessage = true) {
         console.log('🔄 Cambio modalità:', mode);
         
         if (!this.modes[mode]) {
@@ -258,8 +278,10 @@ class VirtualFriend {
             // 🎨 Cambia sfondo animato della chat
             this.switchChatBackground(mode);
             
-            // Messaggio benvenuto
-            this.addChatMessage(`${modeConfig.icon} Modalità ${mode} attivata! ${modeConfig.description}`, 'ai');
+            // Messaggio benvenuto solo se richiesto
+            if (showWelcomeMessage) {
+                this.addChatMessage(`${modeConfig.icon} Modalità ${mode} attivata! ${modeConfig.description}`, 'ai');
+            }
             
             console.log(`✅ Modalità cambiata a: ${mode}`);
         }, 300);
@@ -317,19 +339,44 @@ class VirtualFriend {
         try {
             let response = '';
             
+            // 🧠 Ottieni contesto personalizzazione se apprendimento attivo
+            let personalizationContext = {};
+            if (this.learningSystem) {
+                personalizationContext = this.learningSystem.getPersonalizationContext();
+                
+                // Cerca pattern di successo simili
+                const similarPattern = this.learningSystem.findSimilarSuccessPattern(message, {
+                    mode: this.currentCategory
+                });
+                
+                if (similarPattern) {
+                    console.log('🎯 Pattern simile trovato:', similarPattern);
+                }
+            }
+            
             // Ottieni il gestore della modalità corrente
             const currentHandler = this.modes[this.currentCategory]?.handler;
             
             if (currentHandler && typeof currentHandler.handleMessage === 'function') {
-                // Usa il gestore specifico della modalità
-                response = await currentHandler.handleMessage(message);
+                // Usa il gestore specifico della modalità con contesto personalizzazione
+                response = await currentHandler.handleMessage(message, personalizationContext);
             } else {
                 // Fallback: risposta AI generica
-                response = await this.getAIResponse(message);
+                response = await this.getAIResponse(message, personalizationContext);
             }
             
             this.hideTypingIndicator();
-            this.addChatMessage(response, 'ai');
+            
+            // 🧠 Registra interazione per apprendimento
+            let messageId = null;
+            if (this.learningSystem) {
+                messageId = this.learningSystem.recordInteraction(message, response, {
+                    mode: this.currentCategory,
+                    timestamp: Date.now()
+                });
+            }
+            
+            this.addChatMessage(response, 'ai', messageId);
             this.addToConversationHistory(message, response);
             
         } catch (error) {
@@ -345,9 +392,9 @@ class VirtualFriend {
     saveChatForCurrentMode() {
         if (!this.currentCategory) return;
         
-        const chatMessages = document.querySelectorAll('.message-item');
+        const chatMessages = document.querySelectorAll('.chat-message');
         const messages = Array.from(chatMessages).map(msg => ({
-            content: msg.querySelector('.message-text')?.innerHTML || '',
+            content: msg.querySelector('.message-content')?.innerHTML || '',
             sender: msg.classList.contains('user-message') ? 'user' : 'ai',
             timestamp: Date.now()
         }));
@@ -420,14 +467,14 @@ class VirtualFriend {
     }
     
     // 💬 Aggiungi messaggio alla chat
-    addChatMessage(message, sender, customElement = null) {
+    addChatMessage(message, sender, messageId = null) {
         if (!this.chatMessages) {
             console.error('❌ chatMessages non disponibile');
             return;
         }
         
         const messageDiv = document.createElement('div');
-        messageDiv.className = `message-item ${sender}-message`;
+        messageDiv.className = `chat-message ${sender}-message`;
         
         // Avatar
         const avatarDiv = document.createElement('div');
@@ -436,75 +483,129 @@ class VirtualFriend {
         avatarIcon.className = sender === 'ai' ? 'fas fa-robot' : 'fas fa-user';
         avatarDiv.appendChild(avatarIcon);
         
-        // Bubble messaggio
-        const bubbleDiv = document.createElement('div');
-        bubbleDiv.className = 'message-bubble';
-        
-        // Header
-        const headerDiv = document.createElement('div');
-        headerDiv.className = 'message-header';
-        
-        const senderName = document.createElement('span');
-        senderName.className = 'sender-name';
-        senderName.textContent = sender === 'ai' ? 'BITTRON' : 'USER';
-        
-        const messageTime = document.createElement('span');
-        messageTime.className = 'message-time';
-        messageTime.textContent = new Date().toLocaleTimeString('it-IT', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-        });
-        
-        headerDiv.appendChild(senderName);
-        headerDiv.appendChild(messageTime);
-        
-        // Contenuto
-        const textDiv = document.createElement('div');
-        textDiv.className = 'message-text';
+        // Contenuto messaggio
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content';
         
         // Formattazione specializzata per modalità
         let formattedMessage = message;
         
         // Modalità musica: gestisce i player YouTube
         if (this.currentCategory === 'musica' && sender === 'ai' && message.includes('neural-media-player')) {
-            textDiv.innerHTML = formattedMessage;
+            contentDiv.innerHTML = formattedMessage;
         } 
         // Modalità programmatore: gestisce i container di codice
         else if (this.currentCategory === 'programmatore' && sender === 'ai' && message.includes('neural-code-container')) {
-            textDiv.innerHTML = formattedMessage;
+            contentDiv.innerHTML = formattedMessage;
         }
         // Altre modalità o messaggi normali
         else {
-            // Formattazione base
+            // Formattazione base con paragrafi
             formattedMessage = formattedMessage.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
             formattedMessage = formattedMessage.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-            formattedMessage = formattedMessage.replace(/\n/g, '<br>');
-            textDiv.innerHTML = formattedMessage;
+            
+            // Dividi in paragrafi se ci sono più righe
+            const paragraphs = formattedMessage.split('\n').filter(p => p.trim() !== '');
+            if (paragraphs.length > 1) {
+                contentDiv.innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
+            } else {
+                contentDiv.innerHTML = `<p>${formattedMessage}</p>`;
+            }
         }
         
-        // Elemento personalizzato
-        if (customElement) {
-            textDiv.appendChild(customElement);
+        // 🧠 Aggiungi pulsanti feedback per messaggi AI
+        if (sender === 'ai' && messageId && this.learningSystem) {
+            const feedbackContainer = this.createFeedbackButtons(messageId);
+            contentDiv.appendChild(feedbackContainer);
         }
         
-        // Assembla
-        bubbleDiv.appendChild(headerDiv);
-        bubbleDiv.appendChild(textDiv);
+        // Assemblaggio messaggio (ordine corretto per CSS esistente)
         messageDiv.appendChild(avatarDiv);
-        messageDiv.appendChild(bubbleDiv);
+        messageDiv.appendChild(contentDiv);
         
-        // Animazione
+        // Animazione di entrata
         messageDiv.style.opacity = '0';
         messageDiv.style.transform = 'translateY(20px)';
         this.chatMessages.appendChild(messageDiv);
         
         requestAnimationFrame(() => {
-            messageDiv.style.transition = 'all 0.5s ease-out';
+            messageDiv.style.transition = 'all 0.3s ease-out';
             messageDiv.style.opacity = '1';
             messageDiv.style.transform = 'translateY(0)';
         });
         
-        this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+        this.scrollToBottom();
+    }
+    
+    // 🎯 Crea pulsanti feedback per apprendimento
+    createFeedbackButtons(messageId) {
+        const feedbackContainer = document.createElement('div');
+        feedbackContainer.className = 'feedback-container';
+        feedbackContainer.id = `feedback-${messageId}`;
+        
+        const feedbackButtons = document.createElement('div');
+        feedbackButtons.className = 'feedback-buttons';
+        
+        const buttons = [
+            { icon: '👍', text: 'Utile', rating: 5, reason: 'helpful' },
+            { icon: '👌', text: 'OK', rating: 3, reason: 'acceptable' },
+            { icon: '👎', text: 'Non utile', rating: 2, reason: 'not-helpful' },
+            { icon: '⭐', text: 'Perfetto', rating: 5, reason: 'perfect' }
+        ];
+        
+        buttons.forEach(btnData => {
+            const btn = document.createElement('button');
+            btn.className = 'feedback-btn';
+            btn.innerHTML = `${btnData.icon} ${btnData.text}`;
+            btn.addEventListener('click', () => this.handleFeedback(messageId, btnData.rating, btnData.reason, btn));
+            feedbackButtons.appendChild(btn);
+        });
+        
+        feedbackContainer.appendChild(feedbackButtons);
+        return feedbackContainer;
+    }
+    
+    // 📊 Gestisci feedback utente
+    handleFeedback(messageId, rating, reason, buttonElement) {
+        if (!this.learningSystem) return;
+        
+        // Elabora feedback
+        this.learningSystem.processFeedback({
+            messageId: messageId,
+            rating: rating,
+            reason: reason,
+            context: this.currentCategory,
+            details: null
+        });
+        
+        // Mostra conferma visiva
+        buttonElement.classList.add('selected');
+        buttonElement.textContent = '✅ Grazie!';
+        
+        // Disabilita altri pulsanti
+        const feedbackContainer = document.getElementById(`feedback-${messageId}`);
+        const allButtons = feedbackContainer.querySelectorAll('.feedback-btn');
+        allButtons.forEach(btn => {
+            if (btn !== buttonElement) {
+                btn.style.opacity = '0.5';
+                btn.disabled = true;
+            }
+        });
+        
+        // Nascondi dopo 2 secondi
+        setTimeout(() => {
+            feedbackContainer.style.opacity = '0.7';
+            feedbackContainer.style.transform = 'scale(0.9)';
+        }, 2000);
+        
+        console.log(`📊 Feedback ricevuto: ${rating}/5 (${reason}) per messaggio ${messageId}`);
+    }
+    
+    // ⬇️ Scorri in basso nella chat
+    scrollToBottom() {
+        if (this.chatMessages) {
+            this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+        }
     }
     
     // 🤖 Ottieni risposta AI generica
@@ -706,29 +807,493 @@ class VirtualFriend {
         console.log('🎨 Interfaccia inizializzata');
     }
     
-    // 🔍 Controlla se l'AI è configurata
-    isAIConfigured() {
-        try {
-            // Controlla se esiste configurazione AI
-            if (!AI_CONFIG) {
-                return false;
-            }
-            
-            // Controlla se è configurato per funzionamento offline
-            if (AI_CONFIG.apiUrl === 'offline') {
-                return true;
-            }
-            
-            // Controlla se ha URL API valido
-            if (AI_CONFIG.apiUrl && AI_CONFIG.apiUrl.trim() !== '') {
-                return true;
-            }
-            
-            return false;
-        } catch (error) {
-            console.warn('⚠️ Errore controllo configurazione AI:', error);
-            return false;
+    // 🎯 Inizializza splash screen di benvenuto
+    initializeWelcomeSplash() {
+        console.log('🎯 Inizializzazione splash screen...');
+        
+        const welcomeSplash = document.getElementById('welcome-splash');
+        if (!welcomeSplash) {
+            console.warn('⚠️ Splash screen non trovato');
+            return;
         }
+        
+        // Event listeners per i pulsanti "Scopri le funzioni"
+        const discoverButtons = document.querySelectorAll('.discover-btn');
+        console.log(`📱 Trovati ${discoverButtons.length} pulsanti "Scopri le funzioni"`);
+        discoverButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const mode = btn.dataset.mode;
+                console.log(`🔍 Scopri funzioni per modalità: ${mode}`);
+                this.toggleModeFeatures(mode);
+            });
+        });
+        
+        // Event listeners per i pulsanti "Inizia Chat"
+        const selectButtons = document.querySelectorAll('.select-mode-btn');
+        console.log(`🚀 Trovati ${selectButtons.length} pulsanti "Inizia Chat"`);
+        
+        if (selectButtons.length === 0) {
+            console.warn('⚠️ Nessun pulsante "Inizia Chat" trovato! Verifica HTML.');
+        }
+        
+        selectButtons.forEach((btn, index) => {
+            const mode = btn.dataset.mode;
+            console.log(`� Configurando pulsante ${index + 1} per modalità: ${mode}`);
+            
+            if (!mode) {
+                console.error(`❌ Pulsante ${index + 1} non ha data-mode!`);
+                return;
+            }
+            
+            // Event listener semplificato
+            btn.onclick = (e) => {
+                console.log(`🎯 CLICK! Avvio modalità: ${mode}`);
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Chiamata diretta al metodo
+                this.selectModeAndStart(mode);
+            };
+            
+            console.log(`✅ Event listener aggiunto per: ${mode}`);
+        });
+        
+        // Mostra il splash screen
+        this.showWelcomeSplash();
+    }
+    
+    // 🔍 Toggle funzionalità modalità
+    toggleModeFeatures(mode) {
+        const featuresDiv = document.getElementById(`features-${mode}`);
+        const discoverBtn = document.querySelector(`.discover-btn[data-mode="${mode}"]`);
+        
+        if (featuresDiv && discoverBtn) {
+            if (featuresDiv.classList.contains('hidden')) {
+                // Mostra funzionalità
+                featuresDiv.classList.remove('hidden');
+                discoverBtn.textContent = '🔼 Nascondi funzioni';
+                discoverBtn.style.background = 'rgba(74, 144, 226, 0.4)';
+            } else {
+                // Nascondi funzionalità
+                featuresDiv.classList.add('hidden');
+                discoverBtn.textContent = '🔍 Scopri le funzioni';
+                discoverBtn.style.background = 'rgba(74, 144, 226, 0.2)';
+            }
+        }
+    }
+    
+    // 🚀 Seleziona modalità e avvia chat - VERSIONE SEMPLIFICATA
+    selectModeAndStart(mode) {
+        console.log(`🚀 AVVIO: Modalità selezionata: ${mode}`);
+        
+        // STEP 1: Nasconde immediatamente lo splash screen
+        const welcomeSplash = document.getElementById('welcome-splash');
+        if (welcomeSplash) {
+            console.log('🎭 Chiudendo splash screen...');
+            
+            // Rimuovi completamente dal DOM invece di nascondere
+            welcomeSplash.style.transition = 'opacity 0.3s ease-out';
+            welcomeSplash.style.opacity = '0';
+            welcomeSplash.style.pointerEvents = 'none';
+            welcomeSplash.style.zIndex = '-9999';
+            
+            setTimeout(() => {
+                // Rimuovi completamente l'elemento dal DOM
+                if (welcomeSplash.parentNode) {
+                    welcomeSplash.parentNode.removeChild(welcomeSplash);
+                    console.log('✅ Splash screen rimosso dal DOM');
+                } else {
+                    welcomeSplash.style.display = 'none';
+                    console.log('✅ Splash screen nascosto');
+                }
+                
+                // Assicurati che l'interfaccia principale sia visibile
+                this.showMainInterface();
+            }, 300);
+        } else {
+            console.warn('⚠️ Splash screen non trovato');
+            this.showMainInterface();
+        }
+        
+        // STEP 2: Imposta la modalità corrente
+        console.log(`🔄 Impostando modalità: ${mode}`);
+        this.currentCategory = mode;
+        
+        // STEP 3: Aggiorna l'interfaccia per la modalità
+        setTimeout(() => {
+            try {
+                // Aggiorna avatar e indicatori
+                if (this.modes && this.modes[mode]) {
+                    const modeConfig = this.modes[mode];
+                    this.updateAvatarForMode(modeConfig);
+                    this.updateModeIndicator(modeConfig);
+                    
+                    if (typeof this.switchChatBackground === 'function') {
+                        this.switchChatBackground(mode);
+                    }
+                }
+                
+                // STEP 4: Aggiungi messaggio di benvenuto
+                this.addSimpleWelcomeMessage(mode);
+                
+                console.log(`✅ Modalità ${mode} attivata con successo!`);
+                
+            } catch (error) {
+                console.error('❌ Errore durante attivazione modalità:', error);
+            }
+        }, 400);
+    }
+    
+    // 📱 Mostra interfaccia principale
+    showMainInterface() {
+        console.log('📱 Mostrando interfaccia principale...');
+        
+        // Rimuovi qualsiasi elemento che potrebbe bloccare l'interazione
+        const potentialBlockers = document.querySelectorAll('[style*="z-index"][style*="9999"], [style*="position: fixed"]');
+        potentialBlockers.forEach(element => {
+            if (element.id !== 'welcome-splash' && element.style.zIndex > 1000) {
+                console.log('⚠️ Elemento con z-index alto rilevato:', element);
+                element.style.zIndex = 'auto';
+                element.style.pointerEvents = 'auto';
+            }
+        });
+        
+        // Assicurati che il body sia completamente interattivo
+        document.body.style.overflow = 'auto';
+        document.body.style.pointerEvents = 'auto';
+        document.documentElement.style.pointerEvents = 'auto';
+        
+        // Trova e mostra i principali elementi dell'interfaccia
+        const mainElements = [
+            '.navbar',
+            '.chat-container', 
+            '.main-container',
+            '.container',
+            'nav',
+            'main'
+        ];
+        
+        mainElements.forEach(selector => {
+            const element = document.querySelector(selector);
+            if (element) {
+                element.style.display = '';
+                element.style.visibility = 'visible';
+                element.style.opacity = '1';
+                element.style.pointerEvents = 'auto';
+                console.log(`✅ Elemento mostrato: ${selector}`);
+            }
+        });
+        
+        // Rimuovi eventuali overlay residui
+        const overlays = document.querySelectorAll('.overlay, .modal-overlay, .splash-overlay');
+        overlays.forEach(overlay => {
+            if (overlay.id !== 'welcome-splash') {
+                overlay.style.display = 'none';
+                overlay.style.pointerEvents = 'none';
+            }
+        });
+        
+        // Assicurati che la chat sia funzionale
+        setTimeout(() => {
+            const chatInput = document.querySelector('#user-input, .user-input, input[type="text"]');
+            if (chatInput) {
+                chatInput.focus();
+                console.log('✅ Focus su input chat');
+            }
+            
+            // Test di interattività
+            console.log('🧪 Test interattività completato');
+            console.log('Body pointer-events:', getComputedStyle(document.body).pointerEvents);
+            console.log('Document overflow:', getComputedStyle(document.body).overflow);
+        }, 100);
+    }
+
+    // 🔄 Metodo fallback per chiudere splash e avviare chat
+    closeSplashAndStartChat(mode) {
+        console.log(`🔄 FALLBACK: closeSplashAndStartChat per modalità: ${mode}`);
+        
+        // Nasconde il splash screen
+        const welcomeSplash = document.getElementById('welcome-splash');
+        if (welcomeSplash) {
+            console.log('🎭 Nascondendo splash screen...');
+            welcomeSplash.style.display = 'none';
+        }
+        
+        // Cambia modalità se disponibile
+        if (typeof this.changeMode === 'function') {
+            console.log('🔄 Cambio modalità...');
+            this.changeMode(mode, false);
+        }
+        
+        // Aggiunge messaggio di benvenuto se disponibile
+        setTimeout(() => {
+            if (typeof this.addWelcomeMessage === 'function') {
+                console.log('👋 Aggiungendo messaggio di benvenuto...');
+                this.addWelcomeMessage(mode);
+            } else if (typeof this.addChatMessage === 'function') {
+                console.log('👋 Usando addChatMessage come fallback...');
+                this.addChatMessage(`🚀 Modalità ${mode} attivata!`, 'ai');
+            }
+        }, 500);
+    }
+
+    // 👋 Messaggio di benvenuto personalizzato
+    addWelcomeMessage(mode) {
+        const welcomeMessages = {
+            amico: `👋 Ciao! Sono Bittron, il tuo amico AI! 😊\n\n🎮 Possiamo giocare a scacchi, chiacchierare o divertirci insieme!\n\n💡 **Suggerimenti:**\n• Scrivi "Giochiamo a scacchi!" per una partita\n• Fammi qualsiasi domanda\n• Usa i pulsanti feedback per aiutarmi a migliorare!`,
+            
+            musica: `🎵 Benvenuto nella modalità Musica! 🎧\n\n🎶 Sono qui per far suonare la tua musica preferita direttamente da YouTube!\n\n💡 **Prova questi comandi:**\n• "Suona Bohemian Rhapsody dei Queen"\n• "Fammi sentire jazz rilassante"\n• "Top 10 hit del momento"\n• "Parlami dei Beatles"`,
+            
+            programmatore: `💻 Modalità Programmatore attivata! 🚀\n\n⚙️ Sono qui per aiutarti con codice, debug e sviluppo software!\n\n💡 **Esempi di utilizzo:**\n• "Crea una funzione JavaScript per..."\n• "Aiutami a correggere questo errore"\n• "Come implementare React hooks?"\n• "Progetta un database per un e-commerce"`,
+            
+            ricercatore: `🔬 Modalità Ricercatore pronta! 📊\n\n🌐 Posso aiutarti a trovare informazioni, analizzare dati e fare ricerche approfondite!\n\n💡 **Cosa posso fare:**\n• "Cerca informazioni recenti su..."\n• "Analizza questi dati"\n• "Ultime notizie su..."\n• "Statistiche di mercato per..."`
+        };
+        
+        const message = welcomeMessages[mode] || welcomeMessages.amico;
+        this.addChatMessage(message, 'ai');
+    }
+    
+    // 👋 Messaggio di benvenuto semplificato
+    addSimpleWelcomeMessage(mode) {
+        console.log(`👋 Aggiungendo messaggio di benvenuto per: ${mode}`);
+        
+        const welcomeMessages = {
+            amico: `👋 Ciao! Sono Bittron, il tuo amico AI! 😊\n\n🎮 Possiamo giocare a scacchi, chiacchierare o divertirci insieme!\n\nProva a scrivere "Giochiamo a scacchi!" o fai qualsiasi domanda!`,
+            
+            musica: `🎵 Benvenuto nella modalità Musica! 🎧\n\n🎶 Sono qui per far suonare la tua musica preferita!\n\nProva: "Suona Bohemian Rhapsody dei Queen" o "Fammi sentire jazz rilassante"`,
+            
+            programmatore: `💻 Modalità Programmatore attivata! 🚀\n\n⚙️ Sono qui per aiutarti con codice e sviluppo!\n\nProva: "Crea una funzione JavaScript" o "Aiutami a correggere questo errore"`,
+            
+            ricercatore: `🔬 Modalità Ricercatore pronta! 📊\n\n🌐 Posso aiutarti a trovare informazioni e fare ricerche!\n\nProva: "Cerca informazioni su..." o "Ultime notizie su..."`
+        };
+        
+        const message = welcomeMessages[mode] || welcomeMessages.amico;
+        
+        // Usa il metodo addChatMessage se esiste
+        if (typeof this.addChatMessage === 'function') {
+            this.addChatMessage(message, 'ai');
+            console.log('✅ Messaggio di benvenuto aggiunto');
+        } else {
+            console.warn('⚠️ Metodo addChatMessage non disponibile');
+        }
+    }
+    
+    // 📱 Mostra splash screen
+    showWelcomeSplash() {
+        const welcomeSplash = document.getElementById('welcome-splash');
+        if (welcomeSplash) {
+            welcomeSplash.style.display = 'flex';
+            welcomeSplash.style.animation = 'fadeIn 0.5s ease-out';
+        }
+    }
+    
+    // 🧠 Inizializza sistema di apprendimento continuo
+    async initializeLearningSystem() {
+        if (!this.learningEnabled) {
+            console.log('📚 Sistema di apprendimento disabilitato');
+            return;
+        }
+        
+        try {
+            console.log('🧠 Inizializzazione sistema di apprendimento...');
+            
+            // Aspetta che le classi siano caricate
+            while (typeof AdaptiveLearningSystem === 'undefined') {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            this.learningSystem = new AdaptiveLearningSystem();
+            
+            // Aggiungi pulsante per visualizzare statistiche
+            this.addLearningStatsButton();
+            
+            console.log('✅ Sistema di apprendimento inizializzato');
+        } catch (error) {
+            console.error('❌ Errore inizializzazione learning system:', error);
+            this.learningEnabled = false;
+        }
+    }
+    
+    // 📊 Aggiungi pulsante statistiche apprendimento
+    addLearningStatsButton() {
+        const controlsSection = document.querySelector('.controls-section');
+        if (!controlsSection) return;
+        
+        const statsBtn = document.createElement('button');
+        statsBtn.className = 'control-btn';
+        statsBtn.innerHTML = `
+            <i class="btn-icon fas fa-chart-line"></i>
+            <span class="btn-text">Statistiche AI</span>
+        `;
+        
+        statsBtn.addEventListener('click', () => this.showLearningStats());
+        controlsSection.appendChild(statsBtn);
+    }
+    
+    // 📊 Mostra statistiche apprendimento
+    showLearningStats() {
+        if (!this.learningSystem) return;
+        
+        const stats = this.learningSystem.showLearningStats();
+        const metricsHTML = this.learningSystem.metrics.displayMetrics();
+        
+        // Crea modal con statistiche
+        const modal = document.createElement('div');
+        modal.className = 'learning-stats-modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>🧠 Statistiche Apprendimento AI</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="stats-summary">
+                        <div class="stat-item">
+                            <div class="stat-label">Interazioni Totali</div>
+                            <div class="stat-value">${stats.interactions}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Rating Medio</div>
+                            <div class="stat-value">${stats.avgRating}/5</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Livello Apprendimento</div>
+                            <div class="stat-value">${stats.learningLevel}</div>
+                        </div>
+                    </div>
+                    ${metricsHTML}
+                    <div class="learning-actions">
+                        <button class="action-btn export-btn">📤 Esporta Dati</button>
+                        <button class="action-btn reset-btn">🔄 Reset Apprendimento</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Event listeners
+        modal.querySelector('.modal-close').addEventListener('click', () => modal.remove());
+        modal.querySelector('.export-btn').addEventListener('click', () => {
+            this.learningSystem.storage.exportData();
+            modal.remove();
+        });
+        modal.querySelector('.reset-btn').addEventListener('click', () => {
+            this.learningSystem.resetLearning();
+            modal.remove();
+        });
+        
+        // Chiudi cliccando fuori
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.remove();
+        });
+    }
+    
+    // 🧪 Metodo di test per debug
+    testSplashFunctionality() {
+        console.log('🧪 Test funzionalità splash screen...');
+        
+        const welcomeSplash = document.getElementById('welcome-splash');
+        console.log('Splash screen element:', welcomeSplash);
+        
+        const selectButtons = document.querySelectorAll('.select-mode-btn');
+        console.log(`Pulsanti "Inizia Chat" trovati: ${selectButtons.length}`);
+        
+        selectButtons.forEach((btn, index) => {
+            console.log(`Pulsante ${index + 1}:`, btn);
+            console.log(`- data-mode: ${btn.dataset.mode}`);
+            console.log(`- visible: ${btn.offsetParent !== null}`);
+        });
+        
+        console.log('Metodi disponibili:');
+        console.log('- changeMode:', typeof this.changeMode);
+        console.log('- addWelcomeMessage:', typeof this.addWelcomeMessage);
+        console.log('- selectModeAndStart:', typeof this.selectModeAndStart);
+        
+        // Debug per elementi che potrebbero bloccare l'interazione
+        this.debugBlockingElements();
+    }
+    
+    // 🔍 Debug elementi che bloccano l'interazione
+    debugBlockingElements() {
+        console.log('🔍 Ricerca elementi bloccanti...');
+        
+        // Cerca elementi con z-index alto
+        const highZElements = [];
+        document.querySelectorAll('*').forEach(el => {
+            const zIndex = getComputedStyle(el).zIndex;
+            if (zIndex !== 'auto' && parseInt(zIndex) > 1000) {
+                highZElements.push({
+                    element: el,
+                    zIndex: zIndex,
+                    id: el.id,
+                    className: el.className
+                });
+            }
+        });
+        
+        console.log('Elementi con z-index alto:', highZElements);
+        
+        // Cerca elementi fixed che coprono la pagina
+        const fixedElements = [];
+        document.querySelectorAll('*').forEach(el => {
+            const styles = getComputedStyle(el);
+            if (styles.position === 'fixed' && 
+                (el.offsetWidth > window.innerWidth * 0.5 || el.offsetHeight > window.innerHeight * 0.5)) {
+                fixedElements.push({
+                    element: el,
+                    id: el.id,
+                    className: el.className,
+                    width: el.offsetWidth,
+                    height: el.offsetHeight
+                });
+            }
+        });
+        
+        console.log('Elementi fixed grandi:', fixedElements);
+        
+        // Test pointer-events
+        console.log('Body pointer-events:', getComputedStyle(document.body).pointerEvents);
+        console.log('HTML pointer-events:', getComputedStyle(document.documentElement).pointerEvents);
+    }
+
+    // 🛠️ Rimozione forzata elementi bloccanti (per debug)
+    forceRemoveBlockers() {
+        console.log('🛠️ Rimozione forzata elementi bloccanti...');
+        
+        // Rimuovi splash screen se ancora presente
+        const splash = document.getElementById('welcome-splash');
+        if (splash) {
+            splash.remove();
+            console.log('✅ Splash screen rimosso forzatamente');
+        }
+        
+        // Rimuovi tutti gli elementi con z-index > 9000
+        document.querySelectorAll('*').forEach(el => {
+            const zIndex = getComputedStyle(el).zIndex;
+            if (zIndex !== 'auto' && parseInt(zIndex) > 9000) {
+                el.style.zIndex = '1';
+                el.style.pointerEvents = 'auto';
+                console.log('🔧 Z-index ridotto per:', el);
+            }
+        });
+        
+        // Ripristina pointer-events
+        document.body.style.pointerEvents = 'auto';
+        document.documentElement.style.pointerEvents = 'auto';
+        
+        // Rimuovi qualsiasi overlay
+        document.querySelectorAll('.overlay, [class*="overlay"], [id*="overlay"]').forEach(el => {
+            if (el.id !== 'welcome-splash') {
+                el.style.display = 'none';
+                console.log('🔧 Overlay nascosto:', el);
+            }
+        });
+        
+        console.log('✅ Pulizia completata!');
+        this.debugBlockingElements();
     }
 }
 
