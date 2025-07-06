@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Container Codice - Modalità Programmatore</title>
+    <link rel="stylesheet" href="style-modern.css">
+    <script src="config.js"></script>
+</head>
+<body style="background: #0a0a0a; padding: 20px; font-family: 'Orbitron', monospace;">
+    
+    <div style="max-width: 800px; margin: 0 auto;">
+        <h1 style="color: #00ff00; text-align: center; margin-bottom: 30px;">
+            💻 Test Container Codice Futuristico
+        </h1>
+        
+        <div id="test-container">
+            <!-- I container verranno inseriti qui -->
+        </div>
+        
+        <div style="margin-top: 30px; text-align: center; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+            <button onclick="testJavaScriptContainer()" style="
+                background: linear-gradient(45deg, #f7df1e, #e6c700);
+                color: #000;
+                border: none;
+                padding: 12px 20px;
+                border-radius: 25px;
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                transition: all 0.3s ease;
+            ">⚡ Test JavaScript</button>
+            
+            <button onclick="testPythonContainer()" style="
+                background: linear-gradient(45deg, #3776ab, #2d5a89);
+                color: #fff;
+                border: none;
+                padding: 12px 20px;
+                border-radius: 25px;
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                transition: all 0.3s ease;
+            ">🐍 Test Python</button>
+            
+            <button onclick="testHTMLContainer()" style="
+                background: linear-gradient(45deg, #e34f26, #c73b1a);
+                color: #fff;
+                border: none;
+                padding: 12px 20px;
+                border-radius: 25px;
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                transition: all 0.3s ease;
+            ">🌐 Test HTML</button>
+            
+            <button onclick="testJavaContainer()" style="
+                background: linear-gradient(45deg, #ed8b00, #c76f00);
+                color: #fff;
+                border: none;
+                padding: 12px 20px;
+                border-radius: 25px;
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                transition: all 0.3s ease;
+            ">☕ Test Java</button>
+        </div>
+        
+        <div id="log" style="
+            margin-top: 30px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            color: #00ff00;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        ">
+            <div>📝 Log del sistema...</div>
+        </div>
+    </div>
+
+    <script src="programmatore.js"></script>
+    <script>
+        // Test container JavaScript
+        function testJavaScriptContainer() {
+            log('⚡ Testando container JavaScript...');
+            
+            const jsCode = `// Esempio JavaScript Avanzato
+const users = [
+    { name: 'Alice', age: 25 },
+    { name: 'Bob', age: 30 },
+    { name: 'Charlie', age: 35 }
+];
+
+// Filtro e mappa utenti
+const adults = users
+    .filter(user => user.age >= 18)
+    .map(user => \`\${user.name} (\${user.age} anni)\`);
+
+// Output
+console.log('Utenti adulti:', adults);
+
+// Funzione asincrona
+async function fetchUserData(id) {
+    try {
+        const response = await fetch(\`/api/users/\${id}\`);
+        const userData = await response.json();
+        return userData;
+    } catch (error) {
+        console.error('Errore:', error);
+        return null;
+    }
+}`;
+            
+            testCodeContainer(jsCode, 'javascript', 'advanced_example.js');
+        }
+        
+        // Test container Python
+        function testPythonContainer() {
+            log('🐍 Testando container Python...');
+            
+            const pythonCode = `# Esempio Python Avanzato
+import json
+from datetime import datetime
+from typing import List, Dict
+
+class UserManager:
+    def __init__(self):
+        self.users: List[Dict] = []
+    
+    def add_user(self, name: str, age: int) -> None:
+        """Aggiunge un nuovo utente"""
+        user = {
+            'id': len(self.users) + 1,
+            'name': name,
+            'age': age,
+            'created_at': datetime.now().isoformat()
+        }
+        self.users.append(user)
+        print(f"Utente {name} aggiunto con successo!")
+    
+    def get_adults(self) -> List[Dict]:
+        """Restituisce solo gli utenti maggiorenni"""
+        return [user for user in self.users if user['age'] >= 18]
+    
+    def to_json(self) -> str:
+        """Esporta gli utenti in formato JSON"""
+        return json.dumps(self.users, indent=2)
+
+# Utilizzo
+manager = UserManager()
+manager.add_user('Alice', 25)
+manager.add_user('Bob', 17)
+
+adults = manager.get_adults()
+print(f"Utenti adulti: {len(adults)}")`;
+            
+            testCodeContainer(pythonCode, 'python', 'user_manager.py');
+        }
+        
+        // Test container HTML
+        function testHTMLContainer() {
+            log('🌐 Testando container HTML...');
+            
+            const htmlCode = `<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Futuristica</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f1419, #1a1f24);
+            color: #00ff00;
+            font-family: 'Orbitron', monospace;
+            min-height: 100vh;
+        }
+        
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .card {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+        }
+        
+        .neon-btn {
+            background: linear-gradient(45deg, #00ff00, #00cc00);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .neon-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 255, 0, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h1>🚀 Dashboard Futuristico</h1>
+        
+        <div class="card">
+            <h2>Sistema Status</h2>
+            <p>Tutti i sistemi operativi</p>
+            <button class="neon-btn">Controlla Status</button>
+        </div>
+        
+        <div class="card">
+            <h2>Dati Analytics</h2>
+            <p>Visualizza metriche in tempo reale</p>
+            <button class="neon-btn">Apri Analytics</button>
+        </div>
+    </div>
+</body>
+</html>`;
+            
+            testCodeContainer(htmlCode, 'html', 'futuristic_dashboard.html');
+        }
+        
+        // Test container Java
+        function testJavaContainer() {
+            log('☕ Testando container Java...');
+            
+            const javaCode = `import java.util.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class UserManagementSystem {
+    
+    static class User {
+        private int id;
+        private String name;
+        private int age;
+        private LocalDateTime createdAt;
+        
+        public User(int id, String name, int age) {
+            this.id = id;
+            this.name = name;
+            this.age = age;
+            this.createdAt = LocalDateTime.now();
+        }
+        
+        // Getters
+        public int getId() { return id; }
+        public String getName() { return name; }
+        public int getAge() { return age; }
+        public LocalDateTime getCreatedAt() { return createdAt; }
+        
+        @Override
+        public String toString() {
+            return String.format("User{id=%d, name='%s', age=%d, created=%s}", 
+                id, name, age, createdAt.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        }
+    }
+    
+    public static void main(String[] args) {
+        List<User> users = new ArrayList<>();
+        
+        // Aggiungi utenti
+        users.add(new User(1, "Alice", 25));
+        users.add(new User(2, "Bob", 17));
+        users.add(new User(3, "Charlie", 30));
+        
+        // Filtra utenti adulti
+        users.stream()
+            .filter(user -> user.getAge() >= 18)
+            .forEach(System.out::println);
+        
+        System.out.println("\\nTotale utenti: " + users.size());
+        System.out.println("Utenti adulti: " + 
+            users.stream().mapToInt(u -> u.getAge() >= 18 ? 1 : 0).sum());
+    }
+}`;
+            
+            testCodeContainer(javaCode, 'java', 'UserManagementSystem.java');
+        }
+        
+        // Funzione di test generica
+        function testCodeContainer(code, language, filename) {
+            try {
+                // Simula il ProgrammatoreHandler
+                const mockMain = { currentCategory: 'programmatore' };
+                const programmatoreHandler = new ProgrammatoreHandler(mockMain);
+                
+                // Crea container
+                const container = programmatoreHandler.createCodeContainer(code, language, filename);
+                
+                // Aggiungi al DOM
+                const testContainer = document.getElementById('test-container');
+                testContainer.innerHTML = container;
+                
+                log(`✅ Container ${language} creato con successo!`);
+                log(`📁 File: ${filename}`);
+                log(`📊 Righe: ${code.split('\\n').length}, Caratteri: ${code.length}`);
+                
+                // Testa funzionalità dopo breve delay
+                setTimeout(() => {
+                    const codeElement = testContainer.querySelector('.code-block');
+                    if (codeElement) {
+                        log('✅ Textarea codice trovata e funzionante');
+                    }
+                    
+                    const copyBtn = testContainer.querySelector('.copy-btn');
+                    if (copyBtn) {
+                        log('✅ Bottone copia trovato');
+                    }
+                    
+                    const editBtn = testContainer.querySelector('.edit-btn');
+                    if (editBtn) {
+                        log('✅ Bottone modifica trovato');
+                    }
+                    
+                    log('🎉 Test completato! Prova le funzionalità interattive.');
+                }, 100);
+                
+            } catch (error) {
+                log('❌ Errore durante il test: ' + error.message);
+                console.error('Test error:', error);
+            }
+        }
+        
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', () => {
+            log('🔧 Pagina caricata, sistema pronto');
+            log('💡 Clicca un bottone per testare i container di codice');
+            log('🎯 Ogni container supporta copia, modifica e download');
+        });
+    </script>
+</body>
+</html>

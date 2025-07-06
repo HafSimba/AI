@@ -208,6 +208,9 @@ asyncio.run(main())`
             }
         };
         
+        // Inizializza script per container di codice
+        this.initializeCodeContainerScripts();
+        
         console.log('💻 ProgrammatoreHandler inizializzato');
     }
     
@@ -236,7 +239,10 @@ asyncio.run(main())`
         }
         
         // Risposta AI normale per modalità programmatore
-        return await this.main.getAIResponse(message, null, 'programmatore');
+        const aiResponse = await this.main.getAIResponse(message, null, 'programmatore');
+        
+        // Processa la risposta per estrarre e formattare i blocchi di codice
+        return this.processCodeInResponse(aiResponse);
     }
     
     // 🔍 Controlla se è una richiesta di codice
@@ -245,11 +251,36 @@ asyncio.run(main())`
             'codice', 'programma', 'script', 'funzione', 'classe', 'metodo',
             'javascript', 'python', 'java', 'html', 'css', 'sql', 'php',
             'template', 'esempio', 'come si fa', 'come creare', 'come scrivere',
-            'algoritmo', 'implementazione', 'scrivimi', 'mostrami', 'fammi vedere'
+            'algoritmo', 'implementazione', 'scrivimi', 'mostrami', 'fammi vedere',
+            'sviluppa', 'crea', 'genera', 'build', 'costruisci', 'realizza'
+        ];
+        
+        const codePatterns = [
+            /scriv[iae] (?:un|una|del|il|lo|la) (?:codice|programma|funzione|script|classe)/i,
+            /crea (?:un|una|del|il|lo|la) (?:programma|applicazione|script|funzione)/i,
+            /come (?:fare|creare|scrivere|implementare) (?:un|una|del|il|lo|la)/i,
+            /(?:voglio|vorrei|potresti|puoi) (?:un|una|del|il|lo|la) (?:codice|programma|script)/i,
+            /(?:genera|sviluppa|costruisci|realizza) (?:un|una|del|il|lo|la)/i,
+            /(?:funzione|classe|metodo) (?:per|che|di)/i,
+            /(?:programma|script|codice) (?:per|che|di)/i
         ];
         
         const lowerMessage = message.toLowerCase();
-        return codeKeywords.some(keyword => lowerMessage.includes(keyword));
+        
+        // Controlla pattern specifici
+        const hasPattern = codePatterns.some(pattern => pattern.test(message));
+        if (hasPattern) return true;
+        
+        // Controlla keywords
+        const hasKeyword = codeKeywords.some(keyword => lowerMessage.includes(keyword));
+        if (hasKeyword) return true;
+        
+        // Controlla linguaggi di programmazione menzionati
+        const languages = ['javascript', 'python', 'java', 'html', 'css', 'php', 'sql', 'typescript', 'c++', 'c#'];
+        const hasLanguage = languages.some(lang => lowerMessage.includes(lang.toLowerCase()));
+        if (hasLanguage) return true;
+        
+        return false;
     }
     
     // 🐛 Controlla se è una richiesta di debug
@@ -278,32 +309,194 @@ asyncio.run(main())`
     
     // 💻 Gestisce richieste di codice
     async handleCodeRequest(message) {
+        console.log('💻 Elaborazione richiesta di codice:', message);
+        
+        try {
+            // Analizza la richiesta per estrarre linguaggio e tipo
+            const requestAnalysis = this.analyzeCodeRequest(message);
+            console.log('🔍 Analisi richiesta:', requestAnalysis);
+            
+            // Genera prompt specifico per l'AI
+            const aiPrompt = this.buildCodePrompt(message, requestAnalysis);
+            console.log('🎯 Prompt generato per AI:', aiPrompt);
+            
+            // Controlla se l'AI è disponibile
+            if (!this.main.isAIConfigured()) {
+                console.log('⚠️ AI non configurata, uso fallback');
+                return this.getFallbackCodeResponse(message, requestAnalysis);
+            }
+            
+            // Ottieni risposta dall'AI con prompt specifico
+            const aiResponse = await this.main.getAIResponse(aiPrompt, null, 'programmatore');
+            console.log('🤖 Risposta AI ricevuta:', aiResponse?.substring(0, 200) + '...');
+            
+            // Verifica che la risposta contenga codice
+            if (!this.containsCode(aiResponse)) {
+                console.log('⚠️ Risposta AI senza codice, aggiungo codice generato');
+                return this.enhanceResponseWithCode(aiResponse, requestAnalysis, message);
+            }
+            
+            // Processa la risposta per estrarre e formattare il codice
+            return this.processCodeInResponse(aiResponse);
+            
+        } catch (error) {
+            console.error('❌ Errore nella generazione del codice:', error);
+            
+            // Fallback: usa template se AI non disponibile
+            return this.getFallbackCodeResponse(message, requestAnalysis);
+        }
+    }
+    
+    // 🔍 Analizza la richiesta di codice per estrarre dettagli
+    analyzeCodeRequest(message) {
         const lowerMessage = message.toLowerCase();
         
         // Rileva il linguaggio richiesto
-        let language = 'javascript'; // default
-        if (lowerMessage.includes('python')) language = 'python';
-        else if (lowerMessage.includes('java')) language = 'java';
-        else if (lowerMessage.includes('html')) language = 'html';
-        else if (lowerMessage.includes('css')) language = 'css';
+        let language = null;
+        const languagePatterns = {
+            javascript: ['javascript', 'js', 'node', 'react', 'vue', 'angular'],
+            python: ['python', 'py', 'django', 'flask', 'pandas', 'numpy'],
+            java: ['java', 'spring', 'android'],
+            html: ['html', 'pagina web', 'sito web'],
+            css: ['css', 'stile', 'styling', 'design'],
+            php: ['php', 'laravel', 'wordpress'],
+            sql: ['sql', 'database', 'query', 'mysql', 'postgresql'],
+            cpp: ['c++', 'cpp'],
+            csharp: ['c#', 'csharp', '.net'],
+            typescript: ['typescript', 'ts']
+        };
         
-        // Rileva il tipo di template
-        let templateType = 'basic';
-        if (lowerMessage.includes('async') || lowerMessage.includes('promise')) templateType = 'async';
-        else if (lowerMessage.includes('class') || lowerMessage.includes('oggetto')) templateType = 'class';
-        else if (lowerMessage.includes('react') || lowerMessage.includes('component')) templateType = 'react';
-        else if (lowerMessage.includes('form') || lowerMessage.includes('modulo')) templateType = 'form';
-        
-        // Controlla richieste specifiche
-        if (lowerMessage.includes('somma') && lowerMessage.includes('numeri')) {
-            return this.getSumProgramExamples();
+        for (const [lang, patterns] of Object.entries(languagePatterns)) {
+            if (patterns.some(pattern => lowerMessage.includes(pattern))) {
+                language = lang;
+                break;
+            }
         }
         
-        // Restituisce il template appropriato
-        return this.getCodeTemplate(language, templateType, message);
+        // Se non specificato, prova a dedurre dal contesto
+        if (!language) {
+            if (lowerMessage.includes('web') || lowerMessage.includes('sito')) {
+                language = 'html';
+            } else if (lowerMessage.includes('server') || lowerMessage.includes('backend')) {
+                language = 'python';
+            } else if (lowerMessage.includes('frontend') || lowerMessage.includes('interfaccia')) {
+                language = 'javascript';
+            } else {
+                language = 'javascript'; // Default
+            }
+        }
+        
+        // Rileva il tipo di codice richiesto
+        let codeType = 'function';
+        if (lowerMessage.includes('classe') || lowerMessage.includes('class')) {
+            codeType = 'class';
+        } else if (lowerMessage.includes('programma completo') || lowerMessage.includes('applicazione')) {
+            codeType = 'program';
+        } else if (lowerMessage.includes('funzione') || lowerMessage.includes('function')) {
+            codeType = 'function';
+        } else if (lowerMessage.includes('script')) {
+            codeType = 'script';
+        }
+        
+        // Estrai parole chiave importanti per il contesto
+        const contextKeywords = [];
+        const keywords = [
+            'form', 'formulario', 'input', 'button', 'click', 'event',
+            'api', 'fetch', 'ajax', 'request', 'http',
+            'database', 'sql', 'insert', 'select', 'update', 'delete',
+            'algoritmo', 'sort', 'search', 'filter', 'map', 'reduce',
+            'validazione', 'validation', 'check', 'verify',
+            'file', 'upload', 'download', 'read', 'write',
+            'autenticazione', 'login', 'user', 'password',
+            'calcolo', 'matematica', 'operazione', 'formula'
+        ];
+        
+        keywords.forEach(keyword => {
+            if (lowerMessage.includes(keyword)) {
+                contextKeywords.push(keyword);
+            }
+        });
+        
+        return {
+            language,
+            codeType,
+            contextKeywords,
+            originalMessage: message
+        };
     }
     
-    // 🐛 Gestisce richieste di debug
+    // 🏗️ Costruisce prompt specifico per l'AI
+    buildCodePrompt(originalMessage, analysis) {
+        const { language, codeType, contextKeywords } = analysis;
+        
+        let prompt = `Sei un esperto programmatore ${language}. Un utente ti ha fatto questa richiesta:
+
+"${originalMessage}"
+
+ANALISI RICHIESTA:
+- Linguaggio richiesto: ${language}
+- Tipo di codice: ${codeType}
+- Contesto chiave: ${contextKeywords.join(', ') || 'generico'}
+
+ISTRUZIONI SPECIFICHE:
+1. Scrivi SOLO codice ${language} funzionante e completo
+2. Il codice deve rispondere ESATTAMENTE alla richiesta dell'utente
+3. Includi commenti brevi per spiegare le parti importanti
+4. Usa best practices e sintassi corretta per ${language}
+5. Il codice deve essere pronto all'uso senza modifiche
+
+FORMATO RISPOSTA RICHIESTO:
+- Una breve spiegazione (1-2 righe) di cosa fa il codice
+- Il codice completo racchiuso in blocco \`\`\`${language}
+- Eventuali note sull'utilizzo (se necessarie)
+
+IMPORTANTE: 
+- NON fornire alternative o altri esempi
+- NON spiegare teoria, concentrati sul codice pratico
+- Il codice deve corrispondere al linguaggio ${language} richiesto
+- Rispondi in italiano
+
+Genera ora il codice richiesto:`;
+
+        return prompt;
+    }
+    
+    // 🔄 Risposta di fallback se AI non disponibile
+    getFallbackCodeResponse(message, analysis = null) {
+        console.log('🔄 Generazione fallback per:', message);
+        
+        // Se non abbiamo analisi, facciamola ora
+        if (!analysis) {
+            analysis = this.analyzeCodeRequest(message);
+        }
+        
+        const { language, codeType, contextKeywords } = analysis;
+        
+        // Genera codice personalizzato basato sulla richiesta
+        const customCode = this.generateCustomCode(message, analysis);
+        const filename = this.generateFilename(language, codeType);
+        const codeContainer = this.createCodeContainer(customCode, language, filename);
+        
+        return `💻 **Codice ${language.charAt(0).toUpperCase() + language.slice(1)} Generato**
+
+Ecco il codice per la tua richiesta: "${message}"
+
+${codeContainer}
+
+**💡 Caratteristiche:**
+• Linguaggio: ${language}
+• Tipo: ${codeType}
+• Contesto: ${contextKeywords.join(', ') || 'generico'}
+
+**� Personalizzazioni:**
+• Clicca "Modifica" per adattare il codice
+• Usa "Copia" per copiarlo negli appunti  
+• Clicca "Salva" per scaricare il file
+
+${this.main.isAIConfigured() ? '' : '⚠️ **Nota**: Per codice più personalizzato, configura l\'AI nel sistema.'}`;
+    }
+    
+    // 💻 Gestisce richieste di debug
     async handleDebugRequest(message) {
         return `🐛 **Assistenza Debug**
         
@@ -407,31 +600,48 @@ Usa \`/template\` per vedere tutti i template disponibili.`;
         }
         
         const template = templates[type] || templates.basic;
+        const filename = this.generateFilename(language, type);
+        
+        const codeContainer = this.createCodeContainer(template, language, filename);
         
         return `💻 **Template ${language.charAt(0).toUpperCase() + language.slice(1)} - ${type}**
 
-\`\`\`${language}
-${template}
-\`\`\`
+${codeContainer}
 
 **💡 Suggerimenti:**
-• Modifica il codice secondo le tue esigenze
+• Clicca "Modifica" per personalizzare il codice
+• Usa "Copia" per copiare negli appunti  
+• Clicca "Salva" per scaricare il file
 • Testa il codice in un ambiente di sviluppo
-• Usa \`/debug ${language}\` per guide di debug
 
 **🔧 Altri template disponibili:**
 ${Object.keys(templates).map(t => `• \`/template ${language} ${t}\``).join('\n')}`;
     }
     
+    // 📁 Genera nome file appropriato
+    generateFilename(language, type) {
+        const extensions = {
+            javascript: 'js',
+            python: 'py',
+            html: 'html',
+            css: 'css',
+            java: 'java',
+            php: 'php',
+            sql: 'sql',
+            typescript: 'ts',
+            cpp: 'cpp',
+            csharp: 'cs'
+        };
+        
+        const extension = extensions[language] || 'txt';
+        const typePrefix = type !== 'basic' ? `${type}_` : '';
+        
+        return `${typePrefix}example.${extension}`;
+    }
+    
     // 🔢 Esempi specifici per programma di somma
     getSumProgramExamples() {
-        return `💻 **Programma per sommare due numeri**
-
-Ecco implementazioni complete in diversi linguaggi:
-
-**🐍 Python:**
-\`\`\`python
-# Input
+        const pythonCode = `# Input
 num1 = float(input("Inserisci il primo numero: "))
 num2 = float(input("Inserisci il secondo numero: "))
 
@@ -439,12 +649,9 @@ num2 = float(input("Inserisci il secondo numero: "))
 somma = num1 + num2
 
 # Output
-print(f"La somma è: {somma}")
-\`\`\`
+print(f"La somma è: {somma}")`;
 
-**🟨 JavaScript (Browser):**
-\`\`\`javascript
-// Input
+        const javascriptCode = `// Input
 const num1 = parseFloat(prompt("Inserisci il primo numero:"));
 const num2 = parseFloat(prompt("Inserisci il secondo numero:"));
 
@@ -453,12 +660,9 @@ const somma = num1 + num2;
 
 // Output
 console.log(\`La somma è: \${somma}\`);
-alert(\`La somma è: \${somma}\`);
-\`\`\`
+alert(\`La somma è: \${somma}\`);`;
 
-**🟨 JavaScript (Node.js):**
-\`\`\`javascript
-const readline = require('readline');
+        const nodejsCode = `const readline = require('readline');
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -471,34 +675,32 @@ rl.question('Inserisci il primo numero: ', (num1) => {
         console.log(\`La somma è: \${somma}\`);
         rl.close();
     });
-});
-\`\`\`
+});`;
 
-**☕ Java:**
-\`\`\`java
-import java.util.Scanner;
+        const pythonContainer = this.createCodeContainer(pythonCode, 'python', 'somma.py');
+        const jsContainer = this.createCodeContainer(javascriptCode, 'javascript', 'somma.js');
+        const nodeContainer = this.createCodeContainer(nodejsCode, 'javascript', 'somma_nodejs.js');
+        
+        return `💻 **Programma per sommare due numeri**
 
-public class SommaDueNumeri {
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        
-        System.out.print("Inserisci il primo numero: ");
-        double num1 = scanner.nextDouble();
-        
-        System.out.print("Inserisci il secondo numero: ");
-        double num2 = scanner.nextDouble();
-        
-        double somma = num1 + num2;
-        System.out.println("La somma è: " + somma);
-        
-        scanner.close();
-    }
-}
-\`\`\`
+Ecco implementazioni complete in diversi linguaggi:
 
-💡 **Quale preferisci?** Ogni linguaggio ha i suoi vantaggi!`;
+**🐍 Python (Console):**
+${pythonContainer}
+
+**⚡ JavaScript (Browser):**
+${jsContainer}
+
+**🟢 JavaScript (Node.js):**
+${nodeContainer}
+
+**💡 Come usare:**
+• **Python**: Salva come \`.py\` ed esegui con \`python somma.py\`
+• **Browser**: Salva come \`.html\` e apri nel browser
+• **Node.js**: Salva come \`.js\` ed esegui con \`node somma.js\``;
     }
     
+    // 🔍 Controlla se è una richiesta di debug
     // 📚 Spiegazioni tecniche specifiche
     explainAPI() {
         return `🌐 **Cos'è un'API?**
@@ -964,7 +1166,622 @@ Posso aiutarti con:
 
 Digita \`/help\` per vedere tutti i comandi disponibili!`;
     }
+    
+    // 🎨 Crea container di codice futuristico
+    createCodeContainer(code, language = 'javascript', filename = null) {
+        // Detect language if not specified
+        if (language === 'auto') {
+            language = this.detectLanguage(code);
+        }
+        
+        const containerId = 'code-container-' + Math.random().toString(36).substr(2, 9);
+        const lineCount = code.split('\n').length;
+        const charCount = code.length;
+        const languageInfo = this.getLanguageInfo(language);
+        
+        // Generate line numbers
+        const lineNumbers = Array.from({length: lineCount}, (_, i) => i + 1).join('\n');
+        
+        const containerHtml = `
+        <div class="neural-code-container lang-${language}" id="${containerId}">
+            <!-- Header futuristico -->
+            <div class="code-header">
+                <div class="language-badge">
+                    <div class="language-icon">${languageInfo.icon}</div>
+                    <span>${languageInfo.name}</span>
+                </div>
+                
+                <div class="code-actions">
+                    <button class="code-btn copy-btn" onclick="copyCodeToClipboard('${containerId}')" data-container="${containerId}">
+                        <span class="btn-icon">📋</span>
+                        <span class="btn-text">Copia</span>
+                    </button>
+                    
+                    <button class="code-btn edit-btn" onclick="enableCodeEdit('${containerId}')" data-container="${containerId}">
+                        <span class="btn-icon">✏️</span>
+                        <span class="btn-text">Modifica</span>
+                    </button>
+                    
+                    <button class="code-btn download-btn" onclick="downloadCode('${containerId}', '${filename || 'code.' + languageInfo.extension}')" data-container="${containerId}">
+                        <span class="btn-icon">💾</span>
+                        <span class="btn-text">Salva</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Area contenuto codice -->
+            <div class="code-content" id="${containerId}-content">
+                <div class="line-numbers" id="${containerId}-lines">${lineNumbers}</div>
+                <textarea class="code-block" id="${containerId}-code" readonly spellcheck="false">${code}</textarea>
+            </div>
+            
+            <!-- Footer informazioni -->
+            <div class="code-footer">
+                <div class="code-stats">
+                    <span>Righe: ${lineCount}</span>
+                    <span>Caratteri: ${charCount}</span>
+                    <span>Linguaggio: ${languageInfo.name}</span>
+                    ${filename ? `<span>File: ${filename}</span>` : ''}
+                </div>
+                
+                <button class="code-expand-btn" onclick="toggleCodeExpansion('${containerId}')" data-container="${containerId}">
+                    <span id="${containerId}-expand-text">Espandi</span>
+                </button>
+            </div>
+        </div>
+        
+        <script>
+            // Auto-adjust textarea height
+            setTimeout(() => {
+                const textarea = document.getElementById('${containerId}-code');
+                if (textarea) {
+                    textarea.style.height = 'auto';
+                    textarea.style.height = Math.min(textarea.scrollHeight, 400) + 'px';
+                }
+            }, 100);
+        </script>
+        `;
+        
+        return containerHtml;
+    }
+    
+    // 🔍 Rileva il linguaggio dal codice
+    detectLanguage(code) {
+        const lowerCode = code.toLowerCase();
+        
+        // JavaScript
+        if (lowerCode.includes('function') || lowerCode.includes('const ') || 
+            lowerCode.includes('let ') || lowerCode.includes('var ') ||
+            lowerCode.includes('console.log') || lowerCode.includes('=>')) {
+            return 'javascript';
+        }
+        
+        // Python
+        if (lowerCode.includes('def ') || lowerCode.includes('import ') ||
+            lowerCode.includes('print(') || lowerCode.includes('if __name__') ||
+            lowerCode.includes('class ') && lowerCode.includes(':')) {
+            return 'python';
+        }
+        
+        // HTML
+        if (lowerCode.includes('<!doctype') || lowerCode.includes('<html') ||
+            lowerCode.includes('<body') || lowerCode.includes('<div')) {
+            return 'html';
+        }
+        
+        // CSS
+        if (lowerCode.includes('{') && lowerCode.includes('}') && 
+            (lowerCode.includes('color:') || lowerCode.includes('background:') ||
+             lowerCode.includes('margin:') || lowerCode.includes('padding:'))) {
+            return 'css';
+        }
+        
+        // Java
+        if (lowerCode.includes('public class') || lowerCode.includes('public static void main') ||
+            lowerCode.includes('system.out.println')) {
+            return 'java';
+        }
+        
+        // PHP
+        if (lowerCode.includes('<?php') || lowerCode.includes('$_') ||
+            lowerCode.includes('echo ') || lowerCode.includes('function ')) {
+            return 'php';
+        }
+        
+        // SQL
+        if (lowerCode.includes('select ') || lowerCode.includes('from ') ||
+            lowerCode.includes('where ') || lowerCode.includes('insert into')) {
+            return 'sql';
+        }
+        
+        // TypeScript
+        if (lowerCode.includes('interface ') || lowerCode.includes('type ') ||
+            lowerCode.includes(': string') || lowerCode.includes(': number')) {
+            return 'typescript';
+        }
+        
+        // C++
+        if (lowerCode.includes('#include') || lowerCode.includes('using namespace') ||
+            lowerCode.includes('int main') || lowerCode.includes('cout <<')) {
+            return 'cpp';
+        }
+        
+        // C#
+        if (lowerCode.includes('using system') || lowerCode.includes('namespace ') ||
+            lowerCode.includes('console.writeline')) {
+            return 'csharp';
+        }
+        
+        // Default
+        return 'javascript';
+    }
+    
+    // 📋 Ottieni informazioni del linguaggio
+    getLanguageInfo(language) {
+        const languages = {
+            javascript: {
+                name: 'JavaScript',
+                icon: '⚡',
+                extension: 'js',
+                color: '#f7df1e'
+            },
+            python: {
+                name: 'Python',
+                icon: '🐍',
+                extension: 'py',
+                color: '#3776ab'
+            },
+            html: {
+                name: 'HTML',
+                icon: '🌐',
+                extension: 'html',
+                color: '#e34f26'
+            },
+            css: {
+                name: 'CSS',
+                icon: '🎨',
+                extension: 'css',
+                color: '#1572b6'
+            },
+            java: {
+                name: 'Java',
+                icon: '☕',
+                extension: 'java',
+                color: '#ed8b00'
+            },
+            php: {
+                name: 'PHP',
+                icon: '🐘',
+                extension: 'php',
+                color: '#777bb4'
+            },
+            sql: {
+                name: 'SQL',
+                icon: '🗄️',
+                extension: 'sql',
+                color: '#336791'
+            },
+            typescript: {
+                name: 'TypeScript',
+                icon: '📘',
+                extension: 'ts',
+                color: '#3178c6'
+            },
+            cpp: {
+                name: 'C++',
+                icon: '⚙️',
+                extension: 'cpp',
+                color: '#00599c'
+            },
+            csharp: {
+                name: 'C#',
+                icon: '🔷',
+                extension: 'cs',
+                color: '#239120'
+            },
+            json: {
+                name: 'JSON',
+                icon: '📄',
+                extension: 'json',
+                color: '#000000'
+            },
+            xml: {
+                name: 'XML',
+                icon: '📝',
+                extension: 'xml',
+                color: '#0060ac'
+            }
+        };
+        
+        return languages[language] || languages.javascript;
+    }
+    
+    // 🔍 Controlla se la risposta contiene codice
+    containsCode(response) {
+        if (!response) return false;
+        
+        // Controlla presenza di blocchi di codice
+        const hasCodeBlocks = /```[\w]*\n.*```/s.test(response);
+        
+        // Controlla presenza di parole chiave di codice
+        const codeIndicators = [
+            'function', 'class', 'def ', 'import', 'from', 'const', 'let', 'var',
+            'public', 'private', 'protected', 'return', 'if', 'for', 'while',
+            '()', '{', '}', '=>', 'console.log', 'print(', 'System.out'
+        ];
+        
+        const hasCodeIndicators = codeIndicators.some(indicator => 
+            response.toLowerCase().includes(indicator.toLowerCase())
+        );
+        
+        return hasCodeBlocks || hasCodeIndicators;
+    }
+    
+    // 🎯 Migliora risposta AI aggiungendo codice se mancante
+    enhanceResponseWithCode(aiResponse, analysis, originalMessage) {
+        console.log('🎯 Miglioramento risposta AI con codice generato');
+        
+        const customCode = this.generateCustomCode(originalMessage, analysis);
+        const filename = this.generateFilename(analysis.language, analysis.codeType);
+        const codeContainer = this.createCodeContainer(customCode, analysis.language, filename);
+        
+        return `${aiResponse}
+
+**💻 Codice Generato:**
+
+${codeContainer}`;
+    }
+    
+    // 🛠️ Genera codice personalizzato basato sulla richiesta
+    generateCustomCode(message, analysis) {
+        const { language, codeType, contextKeywords, originalMessage } = analysis;
+        
+        // Template intelligenti basati su keywords e linguaggio
+        if (this.isCalculatorRequest(message)) {
+            return this.generateCalculatorCode(language, message);
+        } else if (this.isFormRequest(message)) {
+            return this.generateFormCode(language, message);
+        } else if (this.isFunctionRequest(message)) {
+            return this.generateFunctionCode(language, message);
+        } else if (this.isApiRequest(message)) {
+            return this.generateApiCode(language, message);
+        } else if (this.isLoopRequest(message)) {
+            return this.generateLoopCode(language, message);
+        } else {
+            return this.generateBasicCode(language, codeType, contextKeywords);
+        }
+    }
+    
+    // 🧮 Rileva richieste di calcolatrice/operazioni matematiche
+    isCalculatorRequest(message) {
+        const calcKeywords = ['calcola', 'somma', 'sottrazione', 'moltiplicazione', 'divisione', 'matematica', 'operazione', 'numero'];
+        return calcKeywords.some(keyword => message.toLowerCase().includes(keyword));
+    }
+    
+    // 📝 Rileva richieste di form/input
+    isFormRequest(message) {
+        const formKeywords = ['form', 'formulario', 'input', 'campo', 'inserimento', 'dati'];
+        return formKeywords.some(keyword => message.toLowerCase().includes(keyword));
+    }
+    
+    // ⚙️ Rileva richieste di funzioni
+    isFunctionRequest(message) {
+        const funcKeywords = ['funzione', 'function', 'metodo', 'procedura'];
+        return funcKeywords.some(keyword => message.toLowerCase().includes(keyword));
+    }
+    
+    // 🌐 Rileva richieste API
+    isApiRequest(message) {
+        const apiKeywords = ['api', 'fetch', 'request', 'http', 'ajax', 'chiamata'];
+        return apiKeywords.some(keyword => message.toLowerCase().includes(keyword));
+    }
+    
+    // 🔄 Rileva richieste di loop/cicli
+    isLoopRequest(message) {
+        const loopKeywords = ['loop', 'ciclo', 'ripeti', 'itera', 'for', 'while'];
+        return loopKeywords.some(keyword => message.toLowerCase().includes(keyword));
+    }
+    
+    // ⚙️ Genera codice per funzioni
+    generateFunctionCode(language, message) {
+        if (language === 'python') {
+            return `def mia_funzione(parametro1, parametro2):
+    """
+    Descrizione della funzione
+    
+    Args:
+        parametro1: Primo parametro
+        parametro2: Secondo parametro
+    
+    Returns:
+        Risultato dell'operazione
+    """
+    risultato = parametro1 + parametro2
+    return risultato
+
+# Esempio di utilizzo
+if __name__ == "__main__":
+    risultato = mia_funzione(5, 10)
+    print(f"Il risultato è: {risultato}")`;
+        } else if (language === 'javascript') {
+            return `// Funzione tradizionale
+function miaFunzione(parametro1, parametro2) {
+    // Logica della funzione
+    const risultato = parametro1 + parametro2;
+    return risultato;
 }
 
-// Export del modulo per uso globale
-window.ProgrammatoreHandler = ProgrammatoreHandler;
+// Arrow function (ES6+)
+const miaFunzioneArrow = (parametro1, parametro2) => {
+    return parametro1 + parametro2;
+};
+
+// Arrow function compatta
+const somma = (a, b) => a + b;
+
+// Esempio di utilizzo
+console.log("Risultato funzione:", miaFunzione(5, 10));
+console.log("Risultato arrow:", miaFunzioneArrow(3, 7));
+console.log("Risultato somma:", somma(2, 8));`;
+        }
+        
+        return this.generateBasicCode(language, 'function', ['function']);
+    }
+    
+    // 🌐 Genera codice per API
+    generateApiCode(language, message) {
+        if (language === 'javascript') {
+            return `// Chiamata API con fetch
+async function fetchData(url) {
+    try {
+        console.log('Richiesta API a:', url);
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                // 'Authorization': 'Bearer your-token'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(\`HTTP error! status: \${response.status}\`);
+        }
+        
+        const data = await response.json();
+        console.log('Dati ricevuti:', data);
+        return data;
+        
+    } catch (error) {
+        console.error('Errore nella richiesta:', error);
+        throw error;
+    }
+}
+
+// Esempio di utilizzo
+fetchData('https://jsonplaceholder.typicode.com/users/1')
+    .then(user => {
+        console.log('Utente:', user.name);
+        // Usa i dati ricevuti
+    })
+    .catch(error => {
+        console.log('Errore:', error.message);
+    });
+
+// POST request
+async function postData(url, data) {
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Errore POST:', error);
+        throw error;
+    }
+}`;
+        } else if (language === 'python') {
+            return `import requests
+import json
+
+def fetch_data(url):
+    """
+    Effettua una richiesta GET all'API
+    """
+    try:
+        print(f"Richiesta API a: {url}")
+        
+        headers = {
+            'Content-Type': 'application/json',
+            # 'Authorization': 'Bearer your-token'
+        }
+        
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # Solleva eccezione per status HTTP >= 400
+        
+        data = response.json()
+        print("Dati ricevuti:", data)
+        return data
+        
+    except requests.exceptions.RequestException as error:
+        print(f"Errore nella richiesta: {error}")
+        raise
+
+def post_data(url, data):
+    """
+    Effettua una richiesta POST all'API
+    """
+    try:
+        headers = {'Content-Type': 'application/json'}
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
+        return response.json()
+        
+    except requests.exceptions.RequestException as error:
+        print(f"Errore POST: {error}")
+        raise
+
+# Esempio di utilizzo
+if __name__ == "__main__":
+    try:
+        user = fetch_data('https://jsonplaceholder.typicode.com/users/1')
+        print(f"Utente: {user['name']}")
+    except Exception as e:
+        print(f"Errore: {e}")`;
+        }
+        
+        return this.generateBasicCode(language, 'function', ['api']);
+    }
+    
+    // 🔄 Genera codice per loop/cicli
+    generateLoopCode(language, message) {
+        if (language === 'python') {
+            return `# Esempi di cicli in Python
+
+# For loop con range
+print("=== For loop con numeri ===")
+for i in range(5):
+    print(f"Numero: {i}")
+
+# For loop con lista
+print("\\n=== For loop con lista ===")
+fruits = ["mela", "banana", "arancia"]
+for fruit in fruits:
+    print(f"Frutto: {fruit}")
+
+# While loop
+print("\\n=== While loop ===")
+count = 0
+while count < 3:
+    print(f"Count: {count}")
+    count += 1
+
+# List comprehension (ciclo avanzato)
+print("\\n=== List comprehension ===")
+squares = [x**2 for x in range(5)]
+print(f"Quadrati: {squares}")
+
+# Ciclo con enumerate (indice + valore)
+print("\\n=== Enumerate ===")
+for index, fruit in enumerate(fruits):
+    print(f"{index}: {fruit}")`;
+        } else if (language === 'javascript') {
+            return `// Esempi di cicli in JavaScript
+
+// For loop tradizionale
+console.log("=== For loop tradizionale ===");
+for (let i = 0; i < 5; i++) {
+    console.log(\`Numero: \${i}\`);
+}
+
+// For...of loop (per array)
+console.log("\\n=== For...of loop ===");
+const fruits = ["mela", "banana", "arancia"];
+for (const fruit of fruits) {
+    console.log(\`Frutto: \${fruit}\`);
+}
+
+// For...in loop (per oggetti)
+console.log("\\n=== For...in loop ===");
+const person = { nome: "Mario", età: 30, città: "Roma" };
+for (const key in person) {
+    console.log(\`\${key}: \${person[key]}\`);
+}
+
+// While loop
+console.log("\\n=== While loop ===");
+let count = 0;
+while (count < 3) {
+    console.log(\`Count: \${count}\`);
+    count++;
+}
+
+// forEach (metodo array)
+console.log("\\n=== Array forEach ===");
+fruits.forEach((fruit, index) => {
+    console.log(\`\${index}: \${fruit}\`);
+});
+
+// Map (trasforma array)
+console.log("\\n=== Array map ===");
+const numbers = [1, 2, 3, 4, 5];
+const squares = numbers.map(x => x * x);
+console.log(\`Originali: \${numbers}\`);
+console.log(\`Quadrati: \${squares}\`);`;
+        }
+        
+        return this.generateBasicCode(language, 'function', ['loop']);
+    }
+    
+    // 🏗️ Genera codice di base
+    generateBasicCode(language, codeType, contextKeywords) {
+        // Usa i template esistenti come fallback
+        const templates = this.codeTemplates[language];
+        if (templates) {
+            return templates.basic || templates[Object.keys(templates)[0]];
+        }
+        
+        // Genera template minimo se il linguaggio non è supportato
+        switch (language) {
+            case 'java':
+                return `public class Example {
+    public static void main(String[] args) {
+        System.out.println("Hello World!");
+        
+        // Il tuo codice qui
+        String message = "Benvenuto in Java!";
+        System.out.println(message);
+    }
+}`;
+            
+            case 'php':
+                return `<?php
+// PHP Script
+echo "Hello World!\\n";
+
+// Variabili
+$nome = "Il tuo nome";
+$eta = 25;
+
+// Funzione
+function saluta($nome) {
+    return "Ciao " . $nome . "!");
+}
+
+echo saluta($nome);
+?>`;
+            
+            case 'sql':
+                return `-- SQL Query Example
+SELECT * FROM users WHERE active = 1;
+
+-- Inserimento dati
+INSERT INTO users (nome, email, data_registrazione)
+VALUES ('Mario Rossi', 'mario@email.com', NOW());
+
+-- Aggiornamento
+UPDATE users 
+SET ultimo_accesso = NOW() 
+WHERE id = 1;
+
+-- Query con JOIN
+SELECT u.nome, u.email, p.titolo as post_title
+FROM users u
+JOIN posts p ON u.id = p.user_id
+WHERE u.active = 1;`;
+            
+            default:
+                return `// Codice di esempio per ${language}
+console.log("Hello World!");
+
+// Il tuo codice qui
+const message = "Benvenuto!";
+console.log(message);`;
+        }
+    }
+}

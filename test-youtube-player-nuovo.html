@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Player YouTube - Modalità Musica</title>
+    <link rel="stylesheet" href="style-modern.css">
+    <script src="config.js"></script>
+</head>
+<body style="background: #0a0a0a; padding: 20px; font-family: 'Orbitron', monospace;">
+    
+    <div style="max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #00ffff; text-align: center; margin-bottom: 30px;">
+            🎵 Test Player YouTube Futuristico
+        </h1>
+        
+        <div id="test-container">
+            <!-- Il player verrà inserito qui -->
+        </div>
+        
+        <div style="margin-top: 30px; text-align: center;">
+            <button onclick="testYouTubePlayer()" style="
+                background: linear-gradient(45deg, #00ffff, #0080ff);
+                color: #000;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 25px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3);
+                transition: all 0.3s ease;
+            " onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 20px rgba(0, 255, 255, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0, 255, 255, 0.3)';">
+                🚀 Testa Player
+            </button>
+        </div>
+        
+        <div id="log" style="
+            margin-top: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            color: #00ffff;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        ">
+            <div>📝 Log di sistema...</div>
+        </div>
+    </div>
+
+    <script src="musica.js"></script>
+    <script>
+        // Test del player YouTube
+        function testYouTubePlayer() {
+            log('🚀 Iniziando test del player YouTube...');
+            
+            try {
+                // Simula un'istanza principale
+                const mockMain = {
+                    getAIResponse: async (message) => {
+                        return "🎵 Test response from AI system";
+                    },
+                    currentCategory: 'musica'
+                };
+                
+                // Crea handler musica
+                const musicaHandler = new MusicaHandler(mockMain);
+                
+                // Test del player con un video di esempio
+                const testVideoData = {
+                    title: "Nayf - OPSS (Visual) ft. Gemitaiz, Mattaz",
+                    url: "https://www.youtube.com/watch?v=NaytVEVO",
+                    videoId: "NaytVEVO",
+                    channelTitle: "NaytVEVO",
+                    thumbnail: "https://img.youtube.com/vi/NaytVEVO/mqdefault.jpg"
+                };
+                
+                log('🎬 Creando player YouTube...');
+                const playerHtml = musicaHandler.createYouTubeEmbed(testVideoData);
+                
+                document.getElementById('test-container').innerHTML = playerHtml;
+                log('✅ Player creato con successo!');
+                log('🎯 Player pronto per l\'interazione');
+                
+                // Test delle funzionalità
+                setTimeout(() => {
+                    log('🔍 Verifica elementi player...');
+                    const player = document.querySelector('.neural-media-player');
+                    if (player) {
+                        log('✅ Container principale trovato');
+                        
+                        const playBtn = document.querySelector('.neural-play-btn');
+                        if (playBtn) {
+                            log('✅ Bottone play trovato');
+                        }
+                        
+                        const controls = document.querySelector('.control-panel');
+                        if (controls) {
+                            log('✅ Pannello controlli trovato');
+                        }
+                        
+                        log('🎉 Test completato! Player pronto per l\'uso.');
+                    } else {
+                        log('❌ Errore: Container player non trovato');
+                    }
+                }, 100);
+                
+            } catch (error) {
+                log('❌ Errore durante il test: ' + error.message);
+                console.error('Test error:', error);
+            }
+        }
+        
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        // Inizializzazione automatica
+        document.addEventListener('DOMContentLoaded', () => {
+            log('🔧 Pagina caricata, sistemi pronti');
+            log('💡 Clicca il bottone per testare il player YouTube');
+        });
+    </script>
+</body>
+</html>

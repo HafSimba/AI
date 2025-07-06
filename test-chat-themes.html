@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Sfondi Animati - Chat Temi</title>
+    <link rel="stylesheet" href="style-modern.css">
+    <style>
+        body {
+            padding: 20px;
+            background: #0a0a0a;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            color: #00ff00;
+            font-family: 'Orbitron', monospace;
+        }
+        .demo-chat {
+            width: 100%;
+            height: 400px;
+            border: 2px solid #00ffff;
+            border-radius: 12px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+            background: rgba(10, 10, 10, 0.5);
+        }
+        .demo-messages {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            height: 100%;
+            overflow-y: auto;
+            color: white;
+        }
+        .demo-message {
+            background: rgba(26, 26, 46, 0.85);
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 10px 15px;
+            margin: 10px 0;
+            max-width: 70%;
+        }
+        .theme-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        .theme-btn {
+            background: linear-gradient(135deg, #00ff00, #00cc00);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .theme-btn:hover {
+            background: linear-gradient(135deg, #00cc00, #009900);
+            transform: translateY(-2px);
+        }
+        .theme-btn.active {
+            background: linear-gradient(135deg, #ff6b6b, #ff5252);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎨 Test Sfondi Animati Chat</h1>
+        <p>Testa i nuovi sfondi animati per ogni modalità AI.</p>
+        
+        <div class="theme-buttons">
+            <button class="theme-btn" onclick="changeTheme('amico')">💬 Amico</button>
+            <button class="theme-btn" onclick="changeTheme('musica')">🎵 Musica</button>
+            <button class="theme-btn" onclick="changeTheme('programmatore')">💻 Programmatore</button>
+            <button class="theme-btn" onclick="changeTheme('ricercatore')">🔍 Ricercatore</button>
+            <button class="theme-btn" onclick="changeTheme('none')">🔄 Nessun Tema</button>
+        </div>
+        
+        <div class="demo-chat" id="demoChat">
+            <div class="demo-messages">
+                <div class="demo-message">
+                    🤖 <strong>BITTRON:</strong> Benvenuto nel test degli sfondi animati! Ogni modalità ha il suo tema distintivo.
+                </div>
+                <div class="demo-message">
+                    👤 <strong>USER:</strong> Fantastico! I temi sono sottili e non interferiscono con la leggibilità.
+                </div>
+                <div class="demo-message">
+                    🤖 <strong>BITTRON:</strong> Esatto! Ogni tema ha animazioni uniche:
+                    <br>• Amico: Fluttuazioni calde (arancione)
+                    <br>• Musica: Pulsazioni ritmiche (rosso)
+                    <br>• Programmatore: Effetti matrix (verde)
+                    <br>• Ricercatore: Rotazioni analitiche (blu)
+                </div>
+                <div class="demo-message">
+                    👤 <strong>USER:</strong> Le animazioni sono fluide e l'effetto è molto immersivo! 
+                </div>
+            </div>
+        </div>
+        
+        <div style="background: rgba(0, 255, 0, 0.1); padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <h3>📊 Caratteristiche Implementate:</h3>
+            <ul>
+                <li>✅ <strong>Sottilità:</strong> Opacità ridotta per non disturbare la lettura</li>
+                <li>✅ <strong>Animazioni fluide:</strong> Transizioni smooth tra temi</li>
+                <li>✅ <strong>Responsive:</strong> Adattamento automatico su mobile</li>
+                <li>✅ <strong>Performance:</strong> Animazioni ottimizzate GPU</li>
+                <li>✅ <strong>Accessibilità:</strong> Rispetto preferenze motion-reduced</li>
+            </ul>
+        </div>
+        
+        <div style="background: rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <h3>🔧 Come Testare nell'App Principale:</h3>
+            <ol>
+                <li>Apri <code>index.html</code></li>
+                <li>Clicca sui tag delle modalità (Amico, Musica, Programmatore, Ricercatore)</li>
+                <li>Osserva il cambio graduale dello sfondo animato</li>
+                <li>Verifica che i messaggi rimangano ben leggibili</li>
+            </ol>
+        </div>
+    </div>
+    
+    <script>
+        function changeTheme(theme) {
+            const demoChat = document.getElementById('demoChat');
+            const buttons = document.querySelectorAll('.theme-btn');
+            
+            // Reset active buttons
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Remove all theme classes
+            demoChat.classList.remove('theme-amico', 'theme-musica', 'theme-programmatore', 'theme-ricercatore');
+            
+            // Apply new theme
+            if (theme !== 'none') {
+                demoChat.classList.add(`theme-${theme}`);
+            }
+            
+            console.log(`🎨 Tema cambiato a: ${theme}`);
+        }
+        
+        console.log('🧪 Test sfondi animati caricato');
+    </script>
+</body>
+</html>

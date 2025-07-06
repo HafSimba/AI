@@ -325,189 +325,317 @@ class MusicaHandler {
         }
     }
     
-    // 🎬 Crea componente embed YouTube AVANZATO
+    // 🎬 Crea componente embed YouTube FUTURISTICO
     createYouTubeEmbed(videoData) {
         const videoId = this.extractYouTubeVideoId(videoData.url);
         if (!videoId) {
             return this.createFallbackVideoPlayer(videoData);
         }
         
-        const embedOptions = AI_CONFIG?.youtube?.embedOptions || {};
-        const width = embedOptions.width || 400;
-        const height = embedOptions.height || 225;
         const playerId = 'youtube-player-' + Math.random().toString(36).substr(2, 9);
         
-        return `<div class="youtube-player-container" style="
-            margin: 15px 0; 
-            background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
-            border-radius: 12px; 
-            padding: 16px; 
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-            border: 1px solid #404040;
-            max-width: 450px;
+        // Creiamo il componente che si integra perfettamente con l'estetica della chat
+        const embedHtml = `
+        <div class="neural-media-player" style="
+            margin: 20px 0;
+            background: linear-gradient(145deg, #0f1419, #1a1f24);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 0;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            max-width: 100%;
         ">
-            <div class="video-header" style="
-                display: flex; 
-                align-items: center; 
-                margin-bottom: 12px; 
-                padding-bottom: 8px; 
-                border-bottom: 1px solid #404040;
+            <!-- Header futuristico -->
+            <div class="media-header" style="
+                background: linear-gradient(90deg, #1a1f24, #0f1419);
+                padding: 12px 16px;
+                border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+                display: flex;
+                align-items: center;
+                gap: 12px;
             ">
-                <div class="youtube-logo" style="
-                    background: #ff0000; 
-                    color: white; 
-                    padding: 4px 8px; 
-                    border-radius: 4px; 
-                    font-size: 12px; 
+                <div class="yt-logo" style="
+                    background: linear-gradient(45deg, #ff0000, #cc0000);
+                    color: white;
+                    padding: 6px 10px;
+                    border-radius: 20px;
+                    font-size: 10px;
                     font-weight: bold;
-                    margin-right: 10px;
-                ">▶ YouTube</div>
-                <div class="video-title" style="
-                    color: #e8e8e8; 
-                    font-size: 14px; 
-                    font-weight: 500;
-                    flex: 1;
-                    line-height: 1.3;
-                ">${this.truncateTitle(videoData.title)}</div>
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3);
+                ">▶ YOUTUBE</div>
+                
+                <div class="track-info" style="flex: 1;">
+                    <div class="track-title" style="
+                        color: #00ffff;
+                        font-size: 13px;
+                        font-weight: 600;
+                        margin-bottom: 2px;
+                        text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+                    ">${this.truncateTitle(videoData.title, 50)}</div>
+                    <div class="track-channel" style="
+                        color: #8892b0;
+                        font-size: 11px;
+                        opacity: 0.8;
+                    ">${videoData.channelTitle || 'YouTube Music'}</div>
+                </div>
+                
+                <div class="status-indicator" style="
+                    width: 8px;
+                    height: 8px;
+                    background: #00ff00;
+                    border-radius: 50%;
+                    box-shadow: 0 0 10px #00ff00;
+                    animation: pulse 2s infinite;
+                "></div>
             </div>
             
-            <div class="player-wrapper" style="
-                position: relative; 
-                background: #000; 
-                border-radius: 8px; 
-                overflow: hidden;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            ">
-                <div id="${playerId}" class="youtube-player" style="
-                    width: 100%; 
-                    height: ${height}px; 
-                    background: #000 url('https://img.youtube.com/vi/${videoId}/mqdefault.jpg') center/cover;
-                    position: relative;
-                    cursor: pointer;
+            <!-- Player area -->
+            <div class="player-zone" style="
+                position: relative;
+                background: #000;
+                height: 200px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                background-image: url('https://img.youtube.com/vi/${videoId}/mqdefault.jpg');
+                background-size: cover;
+                background-position: center;
+            " onclick="this.parentElement.querySelector('.play-overlay').style.display='none'; this.innerHTML='<iframe width=\\'100%\\' height=\\'200\\' src=\\'https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0\\' frameborder=\\'0\\' allow=\\'autoplay; encrypted-media\\' allowfullscreen></iframe>';">
+                <div class="play-overlay" style="
+                    position: absolute;
+                    top: 0; left: 0; right: 0; bottom: 0;
+                    background: rgba(0, 0, 0, 0.7);
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                " data-video-id="${videoId}" data-player-id="${playerId}">
-                    <div class="play-overlay" style="
-                        position: absolute;
-                        top: 0; left: 0; right: 0; bottom: 0;
-                        background: rgba(0,0,0,0.4);
+                    transition: all 0.3s ease;
+                ">
+                    <div class="neural-play-btn" style="
+                        width: 80px;
+                        height: 80px;
+                        background: linear-gradient(45deg, #00ffff, #0080ff);
+                        border-radius: 50%;
                         display: flex;
                         align-items: center;
                         justify-content: center;
+                        cursor: pointer;
                         transition: all 0.3s ease;
-                    ">
-                        <div class="play-button" style="
-                            width: 60px; 
-                            height: 60px; 
-                            background: #ff0000;
+                        box-shadow: 
+                            0 0 20px rgba(0, 255, 255, 0.5),
+                            inset 0 2px 4px rgba(255, 255, 255, 0.2);
+                        position: relative;
+                    " onmouseover="this.style.transform='scale(1.1)'; this.style.boxShadow='0 0 30px rgba(0, 255, 255, 0.8), inset 0 2px 4px rgba(255, 255, 255, 0.2)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 20px rgba(0, 255, 255, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.2)';">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="rgba(0, 0, 0, 0.8)">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        <div style="
+                            position: absolute;
+                            top: -2px; left: -2px; right: -2px; bottom: -2px;
+                            border: 2px solid transparent;
                             border-radius: 50%;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            box-shadow: 0 4px 15px rgba(255,0,0,0.4);
-                            transition: all 0.3s ease;
-                        ">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                                <path d="M8 5v14l11-7z"/>
-                            </svg>
-                        </div>
+                            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+                            animation: rotate 3s linear infinite;
+                        "></div>
                     </div>
                 </div>
             </div>
             
-            <div class="video-controls" style="
-                display: flex; 
-                justify-content: space-between; 
-                align-items: center; 
-                margin-top: 12px;
-                padding-top: 8px;
-                border-top: 1px solid #404040;
+            <!-- Control panel -->
+            <div class="control-panel" style="
+                background: linear-gradient(90deg, #1a1f24, #0f1419);
+                padding: 16px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-top: 1px solid rgba(0, 255, 255, 0.1);
             ">
-                <div class="video-actions" style="display: flex; gap: 8px;">
-                    <button class="youtube-btn" data-action="open" data-url="${videoData.url}" style="
-                        background: #ff0000; 
-                        color: white; 
-                        border: none; 
-                        padding: 6px 12px; 
-                        border-radius: 6px; 
-                        font-size: 12px; 
+                <div class="action-buttons" style="display: flex; gap: 8px;">
+                    <button class="neural-btn" onclick="window.open('${videoData.url}', '_blank')" style="
+                        background: linear-gradient(45deg, #ff0000, #cc0000);
+                        color: white;
+                        border: none;
+                        padding: 8px 16px;
+                        border-radius: 20px;
+                        font-size: 11px;
+                        font-weight: 600;
                         cursor: pointer;
                         transition: all 0.3s ease;
-                    ">
-                        🔗 YouTube
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                        box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3);
+                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(255, 0, 0, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(255, 0, 0, 0.3)';">
+                        � YouTube
                     </button>
-                    <button class="youtube-btn" data-action="share" data-url="${videoData.url}" data-title="${videoData.title.replace(/'/g, "\\\'")}" style="
-                        background: #404040; 
-                        color: #e8e8e8; 
-                        border: none; 
-                        padding: 6px 12px; 
-                        border-radius: 6px; 
-                        font-size: 12px; 
+                    
+                    <button class="neural-btn" onclick="navigator.share ? navigator.share({title: '${videoData.title.replace(/'/g, "\\'")}', url: '${videoData.url}'}) : navigator.clipboard.writeText('${videoData.url}').then(() => this.textContent='✅ Copiato!')" style="
+                        background: linear-gradient(45deg, #00ffff, #0080ff);
+                        color: #000;
+                        border: none;
+                        padding: 8px 16px;
+                        border-radius: 20px;
+                        font-size: 11px;
+                        font-weight: 600;
                         cursor: pointer;
                         transition: all 0.3s ease;
-                    ">
-                        📤 Condividi
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                        box-shadow: 0 2px 8px rgba(0, 255, 255, 0.3);
+                    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0, 255, 255, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0, 255, 255, 0.3)';">
+                        📤 Share
                     </button>
                 </div>
-                <div class="video-info" style="
-                    color: #888; 
-                    font-size: 11px;
+                
+                <div class="track-meta" style="
+                    color: #64748b;
+                    font-size: 10px;
                     text-align: right;
+                    opacity: 0.7;
                 ">
-                    ${videoData.channelTitle || 'YouTube'}
+                    <div>NEURAL STREAM</div>
+                    <div style="margin-top: 2px;">ID: ${videoId.substring(0, 8)}</div>
                 </div>
             </div>
-        </div>`;
+        </div>
+        
+        <style>
+            @keyframes pulse {
+                0%, 100% { opacity: 1; transform: scale(1); }
+                50% { opacity: 0.5; transform: scale(0.8); }
+            }
+            
+            @keyframes rotate {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+            
+            .neural-media-player:hover {
+                box-shadow: 
+                    0 0 25px rgba(0, 255, 255, 0.2),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            }
+        </style>
+        `;
+        
+        return embedHtml;
     }
     
     // 🔄 Crea player di fallback per video non YouTube
     createFallbackVideoPlayer(videoData) {
-        return `<div class="fallback-video-player" style="
-            margin: 15px 0; 
-            background: linear-gradient(135deg, #2c3e50, #34495e);
-            border-radius: 12px; 
-            padding: 16px; 
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-            border: 1px solid #404040;
-            max-width: 450px;
+        return `
+        <div class="neural-media-player fallback" style="
+            margin: 20px 0;
+            background: linear-gradient(145deg, #1a0f0f, #241a1a);
+            border: 1px solid rgba(255, 100, 100, 0.3);
+            border-radius: 12px;
+            padding: 0;
+            box-shadow: 
+                0 0 20px rgba(255, 100, 100, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            max-width: 100%;
         ">
-            <div class="video-header" style="
-                display: flex; 
-                align-items: center; 
-                margin-bottom: 12px;
+            <!-- Header futuristico -->
+            <div class="media-header" style="
+                background: linear-gradient(90deg, #241a1a, #1a0f0f);
+                padding: 12px 16px;
+                border-bottom: 1px solid rgba(255, 100, 100, 0.2);
+                display: flex;
+                align-items: center;
+                gap: 12px;
             ">
-                <div class="music-icon" style="
-                    background: #e74c3c; 
-                    color: white; 
-                    padding: 8px; 
-                    border-radius: 50%; 
-                    margin-right: 12px;
-                ">🎵</div>
-                <div class="video-title" style="
-                    color: #e8e8e8; 
-                    font-size: 14px; 
-                    font-weight: 500;
-                    line-height: 1.3;
-                ">${videoData.title}</div>
+                <div class="external-logo" style="
+                    background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+                    color: white;
+                    padding: 6px 10px;
+                    border-radius: 20px;
+                    font-size: 10px;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+                ">🎵 ESTERNO</div>
+                
+                <div class="track-info" style="flex: 1;">
+                    <div class="track-title" style="
+                        color: #ff6b6b;
+                        font-size: 13px;
+                        font-weight: 600;
+                        margin-bottom: 2px;
+                        text-shadow: 0 0 5px rgba(255, 107, 107, 0.3);
+                    ">${this.truncateTitle(videoData.title, 50)}</div>
+                    <div class="track-channel" style="
+                        color: #b08892;
+                        font-size: 11px;
+                        opacity: 0.8;
+                    ">Link esterno</div>
+                </div>
+                
+                <div class="status-indicator" style="
+                    width: 8px;
+                    height: 8px;
+                    background: #ff6b6b;
+                    border-radius: 50%;
+                    box-shadow: 0 0 10px #ff6b6b;
+                    animation: pulse 2s infinite;
+                "></div>
             </div>
             
-            <div style="text-align: center; padding: 20px;">
-                <p style="color: #bdc3c7; margin-bottom: 15px;">🔗 Link esterno rilevato</p>
+            <!-- Content area -->
+            <div class="content-zone" style="
+                padding: 40px 20px;
+                text-align: center;
+                background: linear-gradient(45deg, #1a0f0f, #241a1a);
+            ">
+                <div style="
+                    width: 80px;
+                    height: 80px;
+                    margin: 0 auto 20px;
+                    background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+                ">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+                        <path d="M13.5 2c-5.621 0-10.211 4.443-10.475 10h-3.025l5 6.625 5-6.625h-2.975c.257-3.351 3.06-6 6.475-6 3.584 0 6.5 2.916 6.5 6.5s-2.916 6.5-6.5 6.5c-1.863 0-3.542-.793-4.728-2.053l-2.427 3.216c1.877 1.754 4.389 2.837 7.155 2.837 5.79 0 10.5-4.71 10.5-10.5s-4.71-10.5-10.5-10.5z"/>
+                    </svg>
+                </div>
+                
+                <p style="
+                    color: #ff6b6b;
+                    font-size: 14px;
+                    margin-bottom: 20px;
+                    font-weight: 500;
+                ">🔗 Link multimediale esterno rilevato</p>
+                
                 <button onclick="window.open('${videoData.url}', '_blank')" style="
-                    background: #e74c3c; 
-                    color: white; 
-                    border: none; 
-                    padding: 12px 24px; 
-                    border-radius: 8px; 
-                    font-size: 14px; 
+                    background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+                    color: white;
+                    border: none;
+                    padding: 12px 24px;
+                    border-radius: 25px;
+                    font-size: 13px;
+                    font-weight: 600;
                     cursor: pointer;
                     transition: all 0.3s ease;
-                ">
-                    🎵 Ascolta Ora
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+                " onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 6px 20px rgba(255, 107, 107, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255, 107, 107, 0.3)';">
+                    🚀 Apri Link
                 </button>
             </div>
-        </div>`;
+        </div>
+        `;
     }
     
     // ✂️ Accorcia i titoli lunghi

@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test AI Code Generation - Progetto AI</title>
+    <link rel="stylesheet" href="style-modern.css">
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        
+        .test-section {
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid rgba(0, 255, 0, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .test-input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #333;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.1);
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #00ff00, #00cc00);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+        }
+        
+        .test-button:hover {
+            background: linear-gradient(135deg, #00cc00, #009900);
+        }
+        
+        .test-output {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            min-height: 100px;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+        }
+        
+        .language-selector {
+            margin: 10px 0;
+        }
+        
+        .language-selector select {
+            background: rgba(0, 0, 0, 0.2);
+            color: #00ff00;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            padding: 8px;
+            border-radius: 4px;
+        }
+        
+        .test-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .example-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(0, 255, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .example-card:hover {
+            background: rgba(0, 255, 0, 0.1);
+            border-color: rgba(0, 255, 0, 0.5);
+        }
+        
+        .example-title {
+            color: #00ff00;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .example-text {
+            color: #ccc;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🤖 Test AI Code Generation</h1>
+        <p>Testa il nuovo sistema di generazione codice AI del Programmatore.</p>
+        
+        <div class="test-section">
+            <h2>📝 Test Personalizzato</h2>
+            
+            <div class="language-selector">
+                <label for="languageSelect">Linguaggio preferito:</label>
+                <select id="languageSelect">
+                    <option value="auto">Automatico</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="python">Python</option>
+                    <option value="html">HTML</option>
+                    <option value="java">Java</option>
+                    <option value="php">PHP</option>
+                    <option value="sql">SQL</option>
+                </select>
+            </div>
+            
+            <textarea id="customRequest" class="test-input" rows="3" placeholder="Scrivi la tua richiesta di codice qui..."></textarea>
+            
+            <button class="test-button" onclick="testCustomRequest()">🔥 Genera Codice</button>
+            <button class="test-button" onclick="clearOutput()">🧹 Pulisci</button>
+            
+            <div id="customOutput" class="test-output">Output del test apparirà qui...</div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🎯 Esempi di Test Rapidi</h2>
+            
+            <div class="test-examples">
+                <div class="example-card" onclick="testExample('Scrivi una funzione JavaScript per sommare due numeri')">
+                    <div class="example-title">🧮 Calcolatrice JS</div>
+                    <div class="example-text">Funzione per sommare due numeri</div>
+                </div>
+                
+                <div class="example-card" onclick="testExample('Crea un programma Python per calcolare la media di una lista')">
+                    <div class="example-title">📊 Media Python</div>
+                    <div class="example-text">Calcolo media di una lista</div>
+                </div>
+                
+                <div class="example-card" onclick="testExample('Genera un form HTML con validazione JavaScript')">
+                    <div class="example-title">📝 Form HTML</div>
+                    <div class="example-text">Form completo con validazione</div>
+                </div>
+                
+                <div class="example-card" onclick="testExample('Scrivi codice JavaScript per fare una chiamata API')">
+                    <div class="example-title">🌐 API Fetch</div>
+                    <div class="example-text">Chiamata API con fetch</div>
+                </div>
+                
+                <div class="example-card" onclick="testExample('Crea un loop Python che stampa i numeri da 1 a 10')">
+                    <div class="example-title">🔄 Loop Python</div>
+                    <div class="example-text">Ciclo for con stampa numeri</div>
+                </div>
+                
+                <div class="example-card" onclick="testExample('Scrivi una classe Java per gestire uno studente')">
+                    <div class="example-title">🎓 Classe Java</div>
+                    <div class="example-text">Classe Student con metodi</div>
+                </div>
+                
+                <div class="example-card" onclick="testExample('Crea query SQL per selezionare utenti attivi')">
+                    <div class="example-title">🗄️ Query SQL</div>
+                    <div class="example-text">SELECT con condizioni</div>
+                </div>
+                
+                <div class="example-card" onclick="testExample('Genera codice PHP per connessione database')">
+                    <div class="example-title">🔗 PHP Database</div>
+                    <div class="example-text">Connessione MySQL con PHP</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>📊 Log Debug</h2>
+            <div id="debugLog" class="test-output">Log di debug apparirà qui...</div>
+            <button class="test-button" onclick="clearDebugLog()">🧹 Pulisci Log</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>ℹ️ Informazioni Test</h2>
+            <p><strong>Cosa testa questa pagina:</strong></p>
+            <ul>
+                <li>🔍 <strong>Rilevamento richieste codice:</strong> Verifica che il sistema riconosca richieste di programmazione</li>
+                <li>🎯 <strong>Analisi richiesta:</strong> Estrazione automatica di linguaggio, tipo e contesto</li>
+                <li>🤖 <strong>Generazione AI:</strong> Creazione di prompt specifici per l'AI</li>
+                <li>📦 <strong>Container codice:</strong> Formatting e presentazione del codice generato</li>
+                <li>🎨 <strong>Personalizzazione:</strong> Codice specifico per la richiesta dell'utente</li>
+            </ul>
+            
+            <p><strong>Risultati attesi:</strong></p>
+            <ul>
+                <li>✅ Codice nel linguaggio richiesto</li>
+                <li>✅ Codice funzionante e completo</li>
+                <li>✅ Container interattivo (copia, modifica, download)</li>
+                <li>✅ Rilevamento automatico del linguaggio se non specificato</li>
+                <li>✅ Codice personalizzato per la specifica richiesta</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Include dei moduli -->
+    <script src="config.js"></script>
+    <script src="main.js"></script>
+    <script src="programmatore.js"></script>
+    
+    <script>
+        // 🧪 Script di test
+        let programmatore;
+        
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simula un'istanza main semplificata per i test
+            const mockMain = {
+                isAIConfigured: () => {
+                    return AI_CONFIG && (AI_CONFIG.apiUrl === 'offline' || AI_CONFIG.apiUrl);
+                },
+                getAIResponse: async (prompt, context, mode) => {
+                    debugLog(`🤖 AI Prompt inviato: ${prompt.substring(0, 100)}...`);
+                    
+                    // Simula risposta AI con codice
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    if (prompt.includes('JavaScript') || prompt.includes('javascript')) {
+                        return `Ecco la funzione JavaScript richiesta:
+
+\`\`\`javascript
+function somma(a, b) {
+    // Verifica che gli input siano numeri
+    if (typeof a !== 'number' || typeof b !== 'number') {
+        throw new Error('Gli input devono essere numeri');
+    }
+    
+    // Calcola e restituisce la somma
+    const risultato = a + b;
+    console.log(\`Somma di \${a} + \${b} = \${risultato}\`);
+    return risultato;
+}
+
+// Esempio di utilizzo
+const result = somma(5, 3);
+console.log('Risultato:', result);
+\`\`\`
+
+Questa funzione somma due numeri con validazione degli input.`;
+                    }
+                    
+                    return `Simulazione risposta AI per: ${prompt.substring(0, 50)}...`;
+                }
+            };
+            
+            programmatore = new ProgrammatoreHandler(mockMain);
+            debugLog('✅ Sistema di test inizializzato');
+            debugLog(`🔧 AI configurata: ${mockMain.isAIConfigured() ? 'SÌ' : 'NO'}`);
+        });
+        
+        // 🎯 Test richiesta personalizzata
+        async function testCustomRequest() {
+            const request = document.getElementById('customRequest').value.trim();
+            const language = document.getElementById('languageSelect').value;
+            const output = document.getElementById('customOutput');
+            
+            if (!request) {
+                output.textContent = '⚠️ Inserisci una richiesta di codice prima di testare.';
+                return;
+            }
+            
+            debugLog(`🔍 Test avviato: "${request}"`);
+            output.textContent = '🔄 Elaborazione in corso...';
+            
+            try {
+                // Se specificato un linguaggio, aggiungiamolo alla richiesta
+                let fullRequest = request;
+                if (language !== 'auto') {
+                    fullRequest = `${request} (in ${language})`;
+                }
+                
+                const result = await programmatore.handleMessage(fullRequest);
+                output.innerHTML = result;
+                
+                debugLog(`✅ Test completato con successo`);
+                
+            } catch (error) {
+                debugLog(`❌ Errore durante il test: ${error.message}`);
+                output.textContent = `❌ Errore: ${error.message}`;
+            }
+        }
+        
+        // 🚀 Test esempio predefinito
+        async function testExample(exampleRequest) {
+            document.getElementById('customRequest').value = exampleRequest;
+            await testCustomRequest();
+        }
+        
+        // 🧹 Pulisce l'output
+        function clearOutput() {
+            document.getElementById('customOutput').textContent = 'Output del test apparirà qui...';
+        }
+        
+        // 📝 Log di debug
+        function debugLog(message) {
+            const logElement = document.getElementById('debugLog');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.textContent += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        // 🧹 Pulisce il log
+        function clearDebugLog() {
+            document.getElementById('debugLog').textContent = 'Log di debug apparirà qui...';
+        }
+        
+        // 🔥 Test richiesta con Enter
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey && document.activeElement.id === 'customRequest') {
+                testCustomRequest();
+            }
+        });
+        
+        console.log('🧪 Pagina di test caricata. Premi Ctrl+Enter per test rapido.');
+    </script>
+</body>
+</html>
+                <button onclick="testRequest('HTML e CSS per una pagina di login moderna')" class="test-btn">
+                    🌐 Login Page
+                </button>
+                <button onclick="testCustomRequest()" class="test-btn primary">
+                    🚀 Testa Richiesta
+                </button>
+            </div>
+        </div>
+        
+        <!-- Area risultati -->
+        <div id="results-container" style="
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid rgba(0, 255, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            min-height: 200px;
+        ">
+            <h3 style="color: #00ff00; margin-bottom: 15px;">📋 Risultati</h3>
+            <div id="results-content">
+                <p style="color: #888; font-style: italic;">Premi un bottone o scrivi una richiesta per vedere il codice generato...</p>
+            </div>
+        </div>
+        
+        <!-- Log del sistema -->
+        <div id="log" style="
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            color: #00ff00;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        ">
+            <div>📝 Log del sistema...</div>
+        </div>
+    </div>
+
+    <style>
+        .test-btn {
+            background: linear-gradient(45deg, rgba(0, 255, 0, 0.2), rgba(0, 255, 0, 0.1));
+            border: 1px solid rgba(0, 255, 0, 0.4);
+            color: #00ff00;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .test-btn:hover {
+            background: linear-gradient(45deg, rgba(0, 255, 0, 0.3), rgba(0, 255, 0, 0.2));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 255, 0, 0.3);
+        }
+        
+        .test-btn.primary {
+            background: linear-gradient(45deg, #00ff00, #00cc00);
+            color: #000;
+            font-weight: 700;
+        }
+        
+        .test-btn.primary:hover {
+            background: linear-gradient(45deg, #00cc00, #009900);
+        }
+    </style>
+
+    <script src="programmatore.js"></script>
+    <script>
+        let programmatoreHandler;
+        
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', () => {
+            log('🔧 Sistema caricato');
+            
+            // Simula istanza principale
+            const mockMain = {
+                currentCategory: 'programmatore',
+                getAIResponse: async (prompt, searchResults, mode) => {
+                    log('🤖 Chiamata AI con prompt: ' + prompt.substring(0, 100) + '...');
+                    
+                    // Simula risposta AI realistica
+                    if (prompt.includes('email')) {
+                        return `Ecco una funzione per validare email in JavaScript:
+
+\`\`\`javascript
+function validateEmail(email) {
+    // Regex pattern per validazione email
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$/;
+    
+    // Controlla se l'email è vuota
+    if (!email || email.trim() === '') {
+        return {
+            valid: false,
+            message: 'Email è richiesta'
+        };
+    }
+    
+    // Testa con regex
+    const isValid = emailRegex.test(email.trim());
+    
+    return {
+        valid: isValid,
+        message: isValid ? 'Email valida' : 'Formato email non valido'
+    };
+}
+
+// Esempio di utilizzo
+const result = validateEmail('user@example.com');
+console.log(result); // { valid: true, message: 'Email valida' }
+\`\`\``;
+                    } else if (prompt.includes('Python') && prompt.includes('database')) {
+                        return `Ecco una classe Python per gestire un database utenti:
+
+\`\`\`python
+import sqlite3
+from datetime import datetime
+from typing import List, Optional
+
+class UserDatabase:
+    def __init__(self, db_path: str = 'users.db'):
+        """Inizializza il database degli utenti"""
+        self.db_path = db_path
+        self.init_database()
+    
+    def init_database(self):
+        """Crea la tabella utenti se non esiste"""
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    email TEXT UNIQUE NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+    
+    def add_user(self, name: str, email: str) -> bool:
+        """Aggiunge un nuovo utente"""
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute(
+                    'INSERT INTO users (name, email) VALUES (?, ?)',
+                    (name, email)
+                )
+                return True
+        except sqlite3.IntegrityError:
+            print(f"Errore: Email {email} già esistente")
+            return False
+    
+    def get_user(self, user_id: int) -> Optional[dict]:
+        """Recupera un utente per ID"""
+        with sqlite3.connect(self.db_path) as conn:
+            conn.row_factory = sqlite3.Row
+            cursor = conn.execute(
+                'SELECT * FROM users WHERE id = ?', (user_id,)
+            )
+            row = cursor.fetchone()
+            return dict(row) if row else None
+
+# Esempio di utilizzo
+db = UserDatabase()
+db.add_user('Mario Rossi', 'mario@email.com')
+user = db.get_user(1)
+print(user)
+\`\`\``;
+                    } else if (prompt.includes('fattoriale') && prompt.includes('Java')) {
+                        return `Ecco un programma Java per calcolare il fattoriale:
+
+\`\`\`java
+import java.util.Scanner;
+
+public class FactorialCalculator {
+    
+    /**
+     * Calcola il fattoriale in modo ricorsivo
+     */
+    public static long factorialRecursive(int n) {
+        if (n < 0) {
+            throw new IllegalArgumentException("Il fattoriale non è definito per numeri negativi");
+        }
+        if (n == 0 || n == 1) {
+            return 1;
+        }
+        return n * factorialRecursive(n - 1);
+    }
+    
+    /**
+     * Calcola il fattoriale in modo iterativo (più efficiente)
+     */
+    public static long factorialIterative(int n) {
+        if (n < 0) {
+            throw new IllegalArgumentException("Il fattoriale non è definito per numeri negativi");
+        }
+        
+        long result = 1;
+        for (int i = 2; i <= n; i++) {
+            result *= i;
+        }
+        return result;
+    }
+    
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.print("Inserisci un numero per calcolare il fattoriale: ");
+        int number = scanner.nextInt();
+        
+        try {
+            long factorial = factorialIterative(number);
+            System.out.println(number + "! = " + factorial);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Errore: " + e.getMessage());
+        }
+        
+        scanner.close();
+    }
+}
+\`\`\``;
+                    } else {
+                        return `Esempio di codice generato per la richiesta: "${prompt.substring(0, 50)}..."
+
+\`\`\`javascript
+// Codice di esempio generato dall'AI
+function exampleFunction() {
+    console.log('Questo è un esempio di codice generato dall\\'AI');
+    return 'Codice personalizzato basato sulla richiesta';
+}
+
+exampleFunction();
+\`\`\``;
+                    }
+                }
+            };
+            
+            // Inizializza handler
+            programmatoreHandler = new ProgrammatoreHandler(mockMain);
+            log('✅ ProgrammatoreHandler inizializzato');
+        });
+        
+        // Test con richiesta predefinita
+        async function testRequest(request) {
+            log('🚀 Test richiesta: ' + request);
+            document.getElementById('user-request').value = request;
+            await processRequest(request);
+        }
+        
+        // Test con richiesta custom
+        async function testCustomRequest() {
+            const request = document.getElementById('user-request').value.trim();
+            if (!request) {
+                log('⚠️ Inserisci una richiesta prima di testare');
+                return;
+            }
+            await processRequest(request);
+        }
+        
+        // Processa la richiesta
+        async function processRequest(request) {
+            const resultsContent = document.getElementById('results-content');
+            
+            try {
+                log('🔍 Analisi richiesta...');
+                
+                // Verifica se è una richiesta di codice
+                const isCodeRequest = programmatoreHandler.isCodeRequest(request);
+                log('📋 È richiesta di codice: ' + (isCodeRequest ? 'SÌ' : 'NO'));
+                
+                if (!isCodeRequest) {
+                    resultsContent.innerHTML = '<p style="color: #ff6b6b;">❌ Richiesta non riconosciuta come richiesta di codice</p>';
+                    return;
+                }
+                
+                // Mostra indicatore di caricamento
+                resultsContent.innerHTML = '<p style="color: #00ff00;">🤖 Generazione codice in corso...</p>';
+                
+                // Genera risposta
+                log('🤖 Generazione risposta...');
+                const response = await programmatoreHandler.handleMessage(request);
+                
+                // Mostra risultato
+                resultsContent.innerHTML = response;
+                log('✅ Codice generato con successo!');
+                
+                // Verifica se contiene container di codice
+                if (response.includes('neural-code-container')) {
+                    log('🎯 Container di codice rilevato nella risposta');
+                } else {
+                    log('⚠️ Nessun container di codice nella risposta');
+                }
+                
+            } catch (error) {
+                log('❌ Errore: ' + error.message);
+                resultsContent.innerHTML = '<p style="color: #ff6b6b;">❌ Errore nella generazione: ' + error.message + '</p>';
+            }
+        }
+        
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+    </script>
+</body>
+</html>

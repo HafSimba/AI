@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Sfondi Animati - Bittron AI</title>
+    
+    <!-- Bulma CSS Framework -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    
+    <!-- Font Awesome per le icone -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style-modern.css">
+    
+    <style>
+        .theme-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(16, 21, 62, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--primary-neon);
+            backdrop-filter: blur(10px);
+        }
+        
+        .theme-btn {
+            margin: 5px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: var(--font-primary);
+        }
+        
+        .theme-btn.amico {
+            background: linear-gradient(135deg, var(--theme-amico-primary), var(--theme-amico-secondary));
+        }
+        
+        .theme-btn.musica {
+            background: linear-gradient(135deg, var(--theme-musica-primary), var(--theme-musica-secondary));
+        }
+        
+        .theme-btn.programmatore {
+            background: linear-gradient(135deg, var(--theme-programmatore-primary), var(--theme-programmatore-secondary));
+        }
+        
+        .theme-btn.ricercatore {
+            background: linear-gradient(135deg, var(--theme-ricercatore-primary), var(--theme-ricercatore-secondary));
+        }
+        
+        .theme-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
+        }
+        
+        .info-panel {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(16, 21, 62, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--primary-neon);
+            backdrop-filter: blur(10px);
+            max-width: 300px;
+        }
+        
+        .current-theme {
+            color: var(--primary-neon);
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body class="has-background-dark">
+    
+    <!-- Pannello Informazioni -->
+    <div class="info-panel">
+        <h3 class="title is-6 has-text-light">
+            <i class="fas fa-palette"></i> Test Sfondi Animati
+        </h3>
+        <p class="has-text-light is-size-7 mb-3">
+            Clicca sui pulsanti per cambiare tema e osservare le animazioni di sfondo.
+        </p>
+        <div class="current-theme" id="current-theme">
+            Tema Corrente: Amico
+        </div>
+        <div class="has-text-light is-size-7 mt-2">
+            <i class="fas fa-info-circle"></i> Gli sfondi sono non intrusivi e mantengono la leggibilità
+        </div>
+    </div>
+
+    <!-- Selettore Temi -->
+    <div class="theme-selector">
+        <h4 class="title is-6 has-text-light mb-3">
+            <i class="fas fa-swatchbook"></i> Seleziona Tema
+        </h4>
+        <div style="display: flex; flex-direction: column;">
+            <button class="theme-btn amico" onclick="switchTheme('amico')">
+                <i class="fas fa-heart"></i> Amico
+            </button>
+            <button class="theme-btn musica" onclick="switchTheme('musica')">
+                <i class="fas fa-music"></i> Musica
+            </button>
+            <button class="theme-btn programmatore" onclick="switchTheme('programmatore')">
+                <i class="fas fa-code"></i> Programmatore
+            </button>
+            <button class="theme-btn ricercatore" onclick="switchTheme('ricercatore')">
+                <i class="fas fa-search"></i> Ricercatore
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container is-fluid main-container">
+        <!-- Chat Section Simulata -->
+        <div class="chat-content theme-amico" id="chat-section" style="min-height: 100vh; padding: 40px; position: relative;">
+            <div class="messages-container" id="chat-messages">
+                
+                <!-- Messaggio di Benvenuto -->
+                <div class="message-item ai-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-bubble">
+                        <div class="message-header">
+                            <span class="sender-name">BITTRON</span>
+                            <span class="message-time">Ora</span>
+                        </div>
+                        <div class="message-text">
+                            <p>🎨 Benvenuto nel test degli sfondi animati! Osserva come cambia l'atmosfera visiva quando selezioni diverse modalità.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messaggio Utente -->
+                <div class="message-item user-message">
+                    <div class="message-bubble">
+                        <div class="message-header">
+                            <span class="sender-name">Utente</span>
+                            <span class="message-time">Ora</span>
+                        </div>
+                        <div class="message-text">
+                            <p>Fantastico! Gli sfondi sono davvero coinvolgenti ma non disturbano la lettura.</p>
+                        </div>
+                    </div>
+                    <div class="message-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+
+                <!-- Messaggio AI per tema Amico -->
+                <div class="message-item ai-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="message-bubble">
+                        <div class="message-header">
+                            <span class="sender-name">AMICO</span>
+                            <span class="message-time">Ora</span>
+                        </div>
+                        <div class="message-text">
+                            <p>🧡 Modalità Amico: Atmosfera calda e accogliente con animazioni dolci e rassicuranti. Perfetta per conversazioni amichevoli!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messaggio AI per tema Musica -->
+                <div class="message-item ai-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <div class="message-bubble">
+                        <div class="message-header">
+                            <span class="sender-name">MUSICA</span>
+                            <span class="message-time">Ora</span>
+                        </div>
+                        <div class="message-text">
+                            <p>🎵 Modalità Musica: Energia vibrante con pulsazioni ritmiche. Le animazioni seguono il beat della creatività musicale!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messaggio AI per tema Programmatore -->
+                <div class="message-item ai-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <div class="message-bubble">
+                        <div class="message-header">
+                            <span class="sender-name">PROGRAMMATORE</span>
+                            <span class="message-time">Ora</span>
+                        </div>
+                        <div class="message-text">
+                            <p>💚 Modalità Programmatore: Matrix-style con effetti tech. Animazioni che richiamano il codice che scorre!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messaggio AI per tema Ricercatore -->
+                <div class="message-item ai-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="message-bubble">
+                        <div class="message-header">
+                            <span class="sender-name">RICERCATORE</span>
+                            <span class="message-time">Ora</span>
+                        </div>
+                        <div class="message-text">
+                            <p>🔍 Modalità Ricercatore: Atmosfera analitica con rotazioni fluide. Ideale per esplorare e analizzare informazioni!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messaggio di Esempio Codice -->
+                <div class="message-item ai-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-bubble">
+                        <div class="message-header">
+                            <span class="sender-name">BITTRON</span>
+                            <span class="message-time">Ora</span>
+                        </div>
+                        <div class="message-text">
+                            <p>✨ <strong>Caratteristiche degli Sfondi Animati:</strong></p>
+                            <ul>
+                                <li>🎨 Non intrusivi - mantengono la leggibilità</li>
+                                <li>🔄 Transizioni fluide tra temi</li>
+                                <li>📱 Responsive per mobile</li>
+                                <li>♿ Rispettano le preferenze di accessibilità</li>
+                                <li>⚡ Performance ottimizzate</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTheme(theme) {
+            const chatSection = document.getElementById('chat-section');
+            const currentThemeDisplay = document.getElementById('current-theme');
+            
+            // Rimuovi tutte le classi tema precedenti
+            chatSection.classList.remove('theme-amico', 'theme-musica', 'theme-programmatore', 'theme-ricercatore');
+            
+            // Applica nuovo tema con delay per transizione fluida
+            setTimeout(() => {
+                chatSection.classList.add(`theme-${theme}`);
+                
+                // Aggiorna display tema corrente
+                const themeNames = {
+                    'amico': 'Amico 🧡',
+                    'musica': 'Musica ❤️',
+                    'programmatore': 'Programmatore 💚',
+                    'ricercatore': 'Ricercatore 💙'
+                };
+                
+                currentThemeDisplay.textContent = `Tema Corrente: ${themeNames[theme]}`;
+                
+                console.log(`🎨 Tema cambiato: ${theme}`);
+            }, 150);
+        }
+
+        // Applica tema di default all'avvio
+        document.addEventListener('DOMContentLoaded', function() {
+            switchTheme('amico');
+            console.log('🚀 Test sfondi animati caricato');
+        });
+    </script>
+
+</body>
+</html>

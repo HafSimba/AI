@@ -209,6 +209,11 @@ class VirtualFriend {
             initializeYouTubePlayerStyles();
         }
         
+        // 🎨 Inizializza sfondo tema di default
+        setTimeout(() => {
+            this.switchChatBackground(this.currentCategory);
+        }, 500);
+        
         this.updateDebugIndicator('✅ Sistema avviato');
         console.log('✅ VirtualFriend inizializzato con successo');
     }
@@ -249,6 +254,9 @@ class VirtualFriend {
             
             // Aggiorna indicatore modalità
             this.updateModeIndicator(modeConfig);
+            
+            // 🎨 Cambia sfondo animato della chat
+            this.switchChatBackground(mode);
             
             // Messaggio benvenuto
             this.addChatMessage(`${modeConfig.icon} Modalità ${mode} attivata! ${modeConfig.description}`, 'ai');
@@ -392,6 +400,25 @@ class VirtualFriend {
         }
     }
     
+    // 🎨 Cambia sfondo animato della chat per la modalità
+    switchChatBackground(mode) {
+        const chatSection = document.getElementById('chat-section');
+        
+        if (!chatSection) {
+            console.warn('⚠️ Elemento chat-section non trovato per cambio sfondo');
+            return;
+        }
+        
+        // Rimuovi tutte le classi tema precedenti
+        chatSection.classList.remove('theme-amico', 'theme-musica', 'theme-programmatore', 'theme-ricercatore');
+        
+        // Applica nuovo tema con piccolo delay per transizione fluida
+        setTimeout(() => {
+            chatSection.classList.add(`theme-${mode}`);
+            console.log(`🎨 Sfondo chat cambiato a tema: ${mode}`);
+        }, 150);
+    }
+    
     // 💬 Aggiungi messaggio alla chat
     addChatMessage(message, sender, customElement = null) {
         if (!this.chatMessages) {
@@ -435,13 +462,25 @@ class VirtualFriend {
         const textDiv = document.createElement('div');
         textDiv.className = 'message-text';
         
-        // Formattazione base
+        // Formattazione specializzata per modalità
         let formattedMessage = message;
-        formattedMessage = formattedMessage.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-        formattedMessage = formattedMessage.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-        formattedMessage = formattedMessage.replace(/\n/g, '<br>');
         
-        textDiv.innerHTML = formattedMessage;
+        // Modalità musica: gestisce i player YouTube
+        if (this.currentCategory === 'musica' && sender === 'ai' && message.includes('neural-media-player')) {
+            textDiv.innerHTML = formattedMessage;
+        } 
+        // Modalità programmatore: gestisce i container di codice
+        else if (this.currentCategory === 'programmatore' && sender === 'ai' && message.includes('neural-code-container')) {
+            textDiv.innerHTML = formattedMessage;
+        }
+        // Altre modalità o messaggi normali
+        else {
+            // Formattazione base
+            formattedMessage = formattedMessage.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            formattedMessage = formattedMessage.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+            formattedMessage = formattedMessage.replace(/\n/g, '<br>');
+            textDiv.innerHTML = formattedMessage;
+        }
         
         // Elemento personalizzato
         if (customElement) {
@@ -665,6 +704,31 @@ class VirtualFriend {
     initializeInterface() {
         // Placeholder per inizializzazione interfaccia
         console.log('🎨 Interfaccia inizializzata');
+    }
+    
+    // 🔍 Controlla se l'AI è configurata
+    isAIConfigured() {
+        try {
+            // Controlla se esiste configurazione AI
+            if (!AI_CONFIG) {
+                return false;
+            }
+            
+            // Controlla se è configurato per funzionamento offline
+            if (AI_CONFIG.apiUrl === 'offline') {
+                return true;
+            }
+            
+            // Controlla se ha URL API valido
+            if (AI_CONFIG.apiUrl && AI_CONFIG.apiUrl.trim() !== '') {
+                return true;
+            }
+            
+            return false;
+        } catch (error) {
+            console.warn('⚠️ Errore controllo configurazione AI:', error);
+            return false;
+        }
     }
 }
 

@@ -16,6 +16,16 @@
     --warning-glow: #ffaa00;
     --danger-glow: #ff4444;
     
+    /* Theme Colors for Modes */
+    --theme-amico-primary: #f39c12;
+    --theme-amico-secondary: #e67e22;
+    --theme-musica-primary: #e74c3c;
+    --theme-musica-secondary: #c0392b;
+    --theme-programmatore-primary: #2ecc71;
+    --theme-programmatore-secondary: #27ae60;
+    --theme-ricercatore-primary: #3498db;
+    --theme-ricercatore-secondary: #2980b9;
+    
     /* Typography */
     --font-primary: 'Orbitron', monospace;
     --font-secondary: 'Inter', sans-serif;
@@ -916,341 +926,1103 @@ body::before {
     50% { opacity: 0.7; }
 }
 
-/* ================================
-   RESPONSIVE DESIGN
-   ================================ */
-
-@media (max-width: 1024px) {
-    .sidebar-panel {
-        width: 300px;
-    }
-    
-    .avatar-hologram {
-        width: 120px;
-        height: 120px;
-    }
-    
-    .hologram-ring:nth-child(1) {
-        width: 120px;
-        height: 120px;
-    }
-    
-    .hologram-ring.ring-2 {
-        width: 140px;
-        height: 140px;
-    }
-    
-    .hologram-ring.ring-3 {
-        width: 160px;
-        height: 160px;
-    }
-    
-    .avatar-core {
-        width: 80px;
-        height: 80px;
-    }
-}
-
-@media (max-width: 768px) {
-    .app-container {
-        flex-direction: column;
-    }
-    
-    .sidebar-panel {
-        width: 100%;
-        height: auto;
-        max-height: 40vh;
-    }
-    
-    .avatar-container {
-        padding: var(--spacing-lg);
-    }
-    
-    .avatar-hologram {
-        width: 100px;
-        height: 100px;
-    }
-    
-    .control-buttons {
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-    
-    .btn-futuristic {
-        flex: 1;
-        min-width: 120px;
-    }
-    
-    .header-content {
-        flex-direction: column;
-        gap: var(--spacing-md);
-        align-items: flex-start;
-    }
-    
-    .title-text {
-        font-size: 1.5rem;
-    }
-    
-    .mode-tags {
-        justify-content: center;
-    }
-    
-    .message-bubble {
-        max-width: 85%;
-    }
-}
-
 /* ========================================
-   YOUTUBE PLAYER INTEGRATION STYLES
+   NEURAL MEDIA PLAYER - YouTube Integration
    ======================================== */
 
-/* YouTube Player Container */
-.youtube-player-container {
-    transition: all 0.3s ease;
-    will-change: transform;
+/* Player Container Base */
+.neural-media-player {
+    margin: 20px 0 !important;
+    background: linear-gradient(145deg, #0f1419, #1a1f24) !important;
+    border: 1px solid rgba(0, 255, 255, 0.3) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    box-shadow: 
+        0 0 20px rgba(0, 255, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    transition: all 0.3s ease !important;
+    max-width: 100% !important;
+    position: relative;
 }
 
-.youtube-player-container:hover {
+.neural-media-player:hover {
+    box-shadow: 
+        0 0 25px rgba(0, 255, 255, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
     transform: translateY(-2px);
-    box-shadow: 0 12px 35px rgba(0,0,0,0.4);
 }
 
-/* YouTube Player Responsive */
+/* Fallback Player Variant */
+.neural-media-player.fallback {
+    background: linear-gradient(145deg, #1a0f0f, #241a1a) !important;
+    border: 1px solid rgba(255, 100, 100, 0.3) !important;
+    box-shadow: 
+        0 0 20px rgba(255, 100, 100, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Media Header */
+.neural-media-player .media-header {
+    background: linear-gradient(90deg, #1a1f24, #0f1419) !important;
+    padding: 12px 16px !important;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+.neural-media-player.fallback .media-header {
+    background: linear-gradient(90deg, #241a1a, #1a0f0f) !important;
+    border-bottom: 1px solid rgba(255, 100, 100, 0.2) !important;
+}
+
+/* YouTube Logo */
+.neural-media-player .yt-logo {
+    background: linear-gradient(45deg, #ff0000, #cc0000) !important;
+    color: white !important;
+    padding: 6px 10px !important;
+    border-radius: 20px !important;
+    font-size: 10px !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3) !important;
+}
+
+.neural-media-player .external-logo {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a52) !important;
+    color: white !important;
+    padding: 6px 10px !important;
+    border-radius: 20px !important;
+    font-size: 10px !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3) !important;
+}
+
+/* Track Info */
+.neural-media-player .track-title {
+    color: #00ffff !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    margin-bottom: 2px !important;
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.3) !important;
+    line-height: 1.2 !important;
+}
+
+.neural-media-player.fallback .track-title {
+    color: #ff6b6b !important;
+    text-shadow: 0 0 5px rgba(255, 107, 107, 0.3) !important;
+}
+
+.neural-media-player .track-channel {
+    color: #8892b0 !important;
+    font-size: 11px !important;
+    opacity: 0.8 !important;
+}
+
+.neural-media-player.fallback .track-channel {
+    color: #b08892 !important;
+}
+
+/* Status Indicator */
+.neural-media-player .status-indicator {
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    animation: neural-pulse 2s infinite !important;
+}
+
+.neural-media-player .status-indicator {
+    background: #00ff00 !important;
+    box-shadow: 0 0 10px #00ff00 !important;
+}
+
+.neural-media-player.fallback .status-indicator {
+    background: #ff6b6b !important;
+    box-shadow: 0 0 10px #ff6b6b !important;
+}
+
+/* Player Zone */
+.neural-media-player .player-zone {
+    position: relative !important;
+    background: #000 !important;
+    height: 200px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    background-size: cover !important;
+    background-position: center !important;
+    overflow: hidden !important;
+}
+
 @media (max-width: 768px) {
-    .youtube-player-container {
-        max-width: 100% !important;
-        margin: 10px 0 !important;
-    }
-    
-    .youtube-player {
-        height: 200px !important;
+    .neural-media-player .player-zone {
+        height: 180px !important;
     }
 }
 
 @media (max-width: 480px) {
-    .youtube-player {
-        height: 180px !important;
+    .neural-media-player .player-zone {
+        height: 160px !important;
+    }
+}
+
+/* Play Overlay */
+.neural-media-player .play-overlay {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0.7) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(1px) !important;
+}
+
+/* Neural Play Button */
+.neural-media-player .neural-play-btn {
+    width: 80px !important;
+    height: 80px !important;
+    background: linear-gradient(45deg, #00ffff, #0080ff) !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 
+        0 0 20px rgba(0, 255, 255, 0.5),
+        inset 0 2px 4px rgba(255, 255, 255, 0.2) !important;
+    position: relative !important;
+}
+
+.neural-media-player .neural-play-btn:hover {
+    transform: scale(1.1) !important;
+    box-shadow: 
+        0 0 30px rgba(0, 255, 255, 0.8),
+        inset 0 2px 4px rgba(255, 255, 255, 0.2) !important;
+}
+
+@media (max-width: 480px) {
+    .neural-media-player .neural-play-btn {
+        width: 60px !important;
+        height: 60px !important;
+    }
+}
+
+/* Control Panel */
+.neural-media-player .control-panel {
+    background: linear-gradient(90deg, #1a1f24, #0f1419) !important;
+    padding: 16px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    border-top: 1px solid rgba(0, 255, 255, 0.1) !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+}
+
+.neural-media-player.fallback .control-panel {
+    background: linear-gradient(90deg, #241a1a, #1a0f0f) !important;
+    border-top: 1px solid rgba(255, 100, 100, 0.1) !important;
+}
+
+/* Action Buttons */
+.neural-media-player .action-buttons {
+    display: flex !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+}
+
+.neural-media-player .neural-btn {
+    border: none !important;
+    padding: 8px 16px !important;
+    border-radius: 20px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    user-select: none !important;
+}
+
+.neural-media-player .neural-btn:first-child {
+    background: linear-gradient(45deg, #ff0000, #cc0000) !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3) !important;
+}
+
+.neural-media-player .neural-btn:last-child {
+    background: linear-gradient(45deg, #00ffff, #0080ff) !important;
+    color: #000 !important;
+    box-shadow: 0 2px 8px rgba(0, 255, 255, 0.3) !important;
+}
+
+.neural-media-player .neural-btn:hover {
+    transform: translateY(-2px) !important;
+}
+
+.neural-media-player .neural-btn:first-child:hover {
+    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4) !important;
+}
+
+.neural-media-player .neural-btn:last-child:hover {
+    box-shadow: 0 4px 12px rgba(0, 255, 255, 0.4) !important;
+}
+
+/* Track Meta */
+.neural-media-player .track-meta {
+    color: #64748b !important;
+    font-size: 10px !important;
+    text-align: right !important;
+    opacity: 0.7 !important;
+    line-height: 1.3 !important;
+}
+
+/* Content Zone (for fallback) */
+.neural-media-player .content-zone {
+    padding: 40px 20px !important;
+    text-align: center !important;
+    background: linear-gradient(45deg, #1a0f0f, #241a1a) !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .neural-media-player {
+        margin: 15px 0 !important;
     }
     
-    .video-header {
+    .neural-media-player .media-header {
+        padding: 10px 12px !important;
+    }
+    
+    .neural-media-player .control-panel {
+        padding: 12px !important;
         flex-direction: column !important;
+        align-items: stretch !important;
+        text-align: center !important;
+    }
+    
+    .neural-media-player .action-buttons {
+        justify-content: center !important;
+        margin-bottom: 8px !important;
+    }
+    
+    .neural-media-player .track-meta {
+        text-align: center !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .neural-media-player .media-header {
+        padding: 8px 10px !important;
+        gap: 8px !important;
+    }
+    
+    .neural-media-player .track-title {
+        font-size: 12px !important;
+    }
+    
+    .neural-media-player .track-channel {
+        font-size: 10px !important;
+    }
+    
+    .neural-media-player .neural-btn {
+        padding: 6px 12px !important;
+        font-size: 10px !important;
+    }
+}
+
+/* Animations */
+@keyframes neural-pulse {
+    0%, 100% { 
+        opacity: 1; 
+        transform: scale(1); 
+    }
+    50% { 
+        opacity: 0.5; 
+        transform: scale(0.8); 
+    }
+}
+
+@keyframes neural-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Iframe Responsiveness */
+.neural-media-player iframe {
+    border-radius: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
+}
+
+/* Additional Player Enhancements */
+.neural-media-player .player-zone::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.05), transparent);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.neural-media-player .neural-play-btn::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: neural-rotate 3s linear infinite;
+    pointer-events: none;
+}
+
+/* Integration with chat messages */
+.ai-message .neural-media-player {
+    margin-top: 15px !important;
+    margin-bottom: 10px !important;
+}
+
+.user-message .neural-media-player {
+    margin-top: 10px !important;
+    margin-bottom: 15px !important;
+}
+
+/* Ensure proper text formatting alongside players */
+.message-text .neural-media-player + p,
+.message-text .neural-media-player + div {
+    margin-top: 15px !important;
+}
+
+.message-text p + .neural-media-player,
+.message-text div + .neural-media-player {
+    margin-top: 15px !important;
+}
+
+/* Dark theme compatibility */
+@media (prefers-color-scheme: dark) {
+    .neural-media-player {
+        background: linear-gradient(145deg, #0a0f13, #141a1f) !important;
+    }
+    
+    .neural-media-player.fallback {
+        background: linear-gradient(145deg, #130a0a, #1f1414) !important;
+    }
+}
+
+/* ========================================
+   NEURAL CODE CONTAINER - Programming Mode
+   ======================================== */
+
+/* Code Container Base */
+.neural-code-container {
+    margin: 20px 0 !important;
+    background: linear-gradient(145deg, #0f1419, #1a1f24) !important;
+    border: 1px solid rgba(0, 255, 0, 0.3) !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    box-shadow: 
+        0 0 20px rgba(0, 255, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    transition: all 0.3s ease !important;
+    max-width: 100% !important;
+    position: relative;
+    font-family: 'Fira Code', 'Consolas', monospace !important;
+}
+
+.neural-code-container:hover {
+    box-shadow: 
+        0 0 25px rgba(0, 255, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    transform: translateY(-2px);
+}
+
+/* Code Header */
+.neural-code-container .code-header {
+    background: linear-gradient(90deg, #1a1f24, #0f1419) !important;
+    padding: 12px 16px !important;
+    border-bottom: 1px solid rgba(0, 255, 0, 0.2) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+/* Language Badge */
+.neural-code-container .language-badge {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background: linear-gradient(45deg, #00ff00, #00cc00) !important;
+    color: #000 !important;
+    padding: 6px 12px !important;
+    border-radius: 20px !important;
+    font-size: 11px !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    box-shadow: 0 2px 8px rgba(0, 255, 0, 0.3) !important;
+}
+
+.neural-code-container .language-icon {
+    width: 16px !important;
+    height: 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 14px !important;
+}
+
+/* Code Actions */
+.neural-code-container .code-actions {
+    display: flex !important;
+    gap: 8px !important;
+}
+
+.neural-code-container .code-btn {
+    background: rgba(0, 255, 0, 0.1) !important;
+    border: 1px solid rgba(0, 255, 0, 0.3) !important;
+    color: #00ff00 !important;
+    padding: 6px 12px !important;
+    border-radius: 16px !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+}
+
+.neural-code-container .code-btn:hover {
+    background: rgba(0, 255, 0, 0.2) !important;
+    border-color: rgba(0, 255, 0, 0.5) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 8px rgba(0, 255, 0, 0.2) !important;
+}
+
+.neural-code-container .code-btn.copy-success {
+    background: rgba(0, 255, 0, 0.3) !important;
+    color: #000 !important;
+}
+
+/* Code Content Area */
+.neural-code-container .code-content {
+    position: relative !important;
+    background: #000 !important;
+    max-height: 400px !important;
+    overflow-y: auto !important;
+}
+
+.neural-code-container .code-content.expanded {
+    max-height: none !important;
+}
+
+/* Code Block */
+.neural-code-container .code-block {
+    background: transparent !important;
+    color: #00ff00 !important;
+    padding: 20px !important;
+    margin: 0 !important;
+    font-family: 'Fira Code', 'Consolas', monospace !important;
+    font-size: 13px !important;
+    line-height: 1.6 !important;
+    white-space: pre-wrap !important;
+    border: none !important;
+    resize: none !important;
+    outline: none !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+.neural-code-container .code-block::-webkit-scrollbar {
+    width: 8px !important;
+}
+
+.neural-code-container .code-block::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3) !important;
+}
+
+.neural-code-container .code-block::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 0, 0.3) !important;
+    border-radius: 4px !important;
+}
+
+.neural-code-container .code-block::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 0, 0.5) !important;
+}
+
+/* Code Line Numbers */
+.neural-code-container .line-numbers {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    background: linear-gradient(90deg, rgba(26, 31, 36, 0.8), transparent) !important;
+    color: rgba(0, 255, 0, 0.4) !important;
+    padding: 20px 12px !important;
+    font-family: 'Fira Code', 'Consolas', monospace !important;
+    font-size: 11px !important;
+    line-height: 1.6 !important;
+    user-select: none !important;
+    pointer-events: none !important;
+    width: 40px !important;
+    text-align: right !important;
+    border-right: 1px solid rgba(0, 255, 0, 0.1) !important;
+}
+
+.neural-code-container .code-block {
+    padding-left: 60px !important;
+}
+
+/* Code Footer */
+.neural-code-container .code-footer {
+    background: linear-gradient(90deg, #1a1f24, #0f1419) !important;
+    padding: 12px 16px !important;
+    border-top: 1px solid rgba(0, 255, 0, 0.1) !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    font-size: 10px !important;
+    color: rgba(0, 255, 0, 0.6) !important;
+}
+
+.neural-code-container .code-stats {
+    display: flex !important;
+    gap: 16px !important;
+}
+
+.neural-code-container .code-expand-btn {
+    background: none !important;
+    border: none !important;
+    color: rgba(0, 255, 0, 0.8) !important;
+    cursor: pointer !important;
+    font-size: 10px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    transition: all 0.3s ease !important;
+}
+
+.neural-code-container .code-expand-btn:hover {
+    color: #00ff00 !important;
+}
+
+/* Language-specific styling */
+.neural-code-container.lang-javascript .language-badge {
+    background: linear-gradient(45deg, #f7df1e, #e6c700) !important;
+    color: #000 !important;
+}
+
+.neural-code-container.lang-python .language-badge {
+    background: linear-gradient(45deg, #3776ab, #2d5a89) !important;
+    color: #fff !important;
+}
+
+.neural-code-container.lang-html .language-badge {
+    background: linear-gradient(45deg, #e34f26, #c73b1a) !important;
+    color: #fff !important;
+}
+
+.neural-code-container.lang-css .language-badge {
+    background: linear-gradient(45deg, #1572b6, #0f5a8a) !important;
+    color: #fff !important;
+}
+
+.neural-code-container.lang-java .language-badge {
+    background: linear-gradient(45deg, #ed8b00, #c76f00) !important;
+    color: #fff !important;
+}
+
+.neural-code-container.lang-cpp .language-badge {
+    background: linear-gradient(45deg, #00599c, #004080) !important;
+    color: #fff !important;
+}
+
+.neural-code-container.lang-csharp .language-badge {
+    background: linear-gradient(45deg, #239120, #1a6b18) !important;
+    color: #fff !important;
+}
+
+.neural-code-container.lang-php .language-badge {
+    background: linear-gradient(45deg, #777bb4, #5a5a8a) !important;
+    color: #fff !important;
+}
+
+.neural-code-container.lang-typescript .language-badge {
+    background: linear-gradient(45deg, #3178c6, #2558a3) !important;
+    color: #fff !important;
+}
+
+.neural-code-container.lang-sql .language-badge {
+    background: linear-gradient(45deg, #336791, #254a6b) !important;
+    color: #fff !important;
+}
+
+/* Syntax highlighting colors */
+.neural-code-container .code-keyword {
+    color: #ff6b6b !important;
+    font-weight: bold !important;
+}
+
+.neural-code-container .code-string {
+    color: #4ecdc4 !important;
+}
+
+.neural-code-container .code-comment {
+    color: #6c757d !important;
+    font-style: italic !important;
+}
+
+.neural-code-container .code-function {
+    color: #ffd93d !important;
+}
+
+.neural-code-container .code-number {
+    color: #a8e6cf !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .neural-code-container {
+        margin: 15px 0 !important;
+    }
+    
+    .neural-code-container .code-header {
+        padding: 10px 12px !important;
+        flex-direction: column !important;
+        gap: 8px !important;
         align-items: flex-start !important;
     }
     
-    .youtube-logo {
-        margin-bottom: 8px !important;
+    .neural-code-container .code-actions {
+        width: 100% !important;
+        justify-content: flex-end !important;
+    }
+    
+    .neural-code-container .code-block {
+        font-size: 12px !important;
+        padding: 15px !important;
+        padding-left: 50px !important;
+    }
+    
+    .neural-code-container .line-numbers {
+        padding: 15px 8px !important;
+        width: 35px !important;
+        font-size: 10px !important;
     }
 }
 
-/* Play Button Animations */
-.youtube-player-container .play-button {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+@media (max-width: 480px) {
+    .neural-code-container .code-header {
+        padding: 8px 10px !important;
+    }
+    
+    .neural-code-container .language-badge {
+        font-size: 10px !important;
+        padding: 4px 8px !important;
+    }
+    
+    .neural-code-container .code-btn {
+        font-size: 9px !important;
+        padding: 4px 8px !important;
+    }
+    
+    .neural-code-container .code-block {
+        font-size: 11px !important;
+        padding: 12px !important;
+        padding-left: 45px !important;
+    }
+    
+    .neural-code-container .line-numbers {
+        width: 30px !important;
+        padding: 12px 6px !important;
+    }
 }
 
-.youtube-player-container:hover .play-button {
-    transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(255,0,0,0.6);
+/* Animation for code appearance */
+.neural-code-container {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: codeSlideIn 0.5s ease-out forwards;
 }
 
-.youtube-player-container:active .play-button {
-    transform: scale(0.95);
+@keyframes codeSlideIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-/* Loading Animation for Player */
-.youtube-player.loading::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 40px;
-    height: 40px;
-    margin: -20px 0 0 -20px;
-    border: 3px solid rgba(255,255,255,0.3);
-    border-top: 3px solid var(--primary-neon);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+/* Integration with chat messages */
+.ai-message .neural-code-container {
+    margin-top: 15px !important;
+    margin-bottom: 10px !important;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+.user-message .neural-code-container {
+    margin-top: 10px !important;
+    margin-bottom: 15px !important;
 }
 
-/* Video Controls Enhancements */
-.video-actions button {
-    transition: all 0.3s ease;
+/* Ensure proper text formatting alongside code */
+.message-text .neural-code-container + p,
+.message-text .neural-code-container + div {
+    margin-top: 15px !important;
+}
+
+.message-text p + .neural-code-container,
+.message-text div + .neural-code-container {
+    margin-top: 15px !important;
+}
+
+/* Dark theme compatibility */
+@media (prefers-color-scheme: dark) {
+    .neural-code-container {
+        background: linear-gradient(145deg, #0a0f13, #141a1f) !important;
+    }
+    
+    .neural-code-container .code-content {
+        background: #000 !important;
+    }
+}
+
+/* ================================
+   ANIMATED THEME BACKGROUNDS
+   ================================ */
+
+/* Base setup for animated backgrounds */
+#chat-section {
     position: relative;
     overflow: hidden;
 }
 
-.video-actions button::before {
+#chat-section::before {
     content: '';
     position: absolute;
     top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: left 0.5s ease;
-}
-
-.video-actions button:hover::before {
-    left: 100%;
-}
-
-/* Fallback Video Player Styles */
-.fallback-video-player {
-    transition: all 0.3s ease;
-}
-
-.fallback-video-player:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 35px rgba(0,0,0,0.4);
-}
-
-/* Notification System Integration */
-.youtube-notification {
-    background: linear-gradient(135deg, #ff0000, #cc0000);
-    border-left: 4px solid #ffffff;
-}
-
-.youtube-notification.success {
-    background: linear-gradient(135deg, var(--success-glow), #00cc66);
-}
-
-/* Music Mode Specific Enhancements */
-.message-item.ai-message .youtube-player-container {
-    border: 1px solid rgba(231, 76, 60, 0.3);
-    background: linear-gradient(135deg, #1e1e1e, #2a1a1a);
-}
-
-.message-item.ai-message .youtube-player-container .youtube-logo {
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
-    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4);
-}
-
-/* Integration with Chat Interface */
-.chat-content .youtube-player-container {
-    max-width: 100%;
-    margin: 15px auto;
-}
-
-/* Dark Mode Optimizations */
-@media (prefers-color-scheme: dark) {
-    .youtube-player-container {
-        background: linear-gradient(135deg, #0a0a0a, #1a1a1a) !important;
-        border-color: #333 !important;
-    }
-    
-    .video-header {
-        border-bottom-color: #333 !important;
-    }
-    
-    .video-controls {
-        border-top-color: #333 !important;
-    }
-}
-
-/* Accessibility Improvements */
-.youtube-player-container:focus-within {
-    outline: 2px solid var(--primary-neon);
-    outline-offset: 2px;
-}
-
-.video-actions button:focus {
-    outline: 2px solid rgba(255, 255, 255, 0.5);
-    outline-offset: 2px;
-}
-
-/* High Performance GPU Acceleration */
-.youtube-player,
-.play-overlay,
-.play-button {
-    backface-visibility: hidden;
-    perspective: 1000px;
-    transform: translateZ(0);
-}
-
-/* Smooth Scrolling for Video Loading */
-@media (prefers-reduced-motion: no-preference) {
-    .youtube-player-container {
-        scroll-behavior: smooth;
-    }
-}
-
-/* Print Styles */
-@media print {
-    .youtube-player-container {
-        display: none;
-    }
-    
-    .youtube-player-container::after {
-        content: "Video: " attr(data-title);
-        display: block;
-        padding: 10px;
-        background: #f0f0f0;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
-}
-
-/* ================================
-   UTILITY CLASSES
-   ================================ */
-
-.is-hidden {
-    display: none !important;
-}
-
-.is-loading {
+    left: 0;
+    right: 0;
+    bottom: 0;
     pointer-events: none;
-    opacity: 0.7;
+    z-index: 0;
+    opacity: 0;
+    transition: all 0.8s ease-in-out;
 }
 
-.has-glow {
-    box-shadow: 0 0 20px var(--primary-neon);
+#chat-section::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0;
+    transition: all 0.8s ease-in-out;
 }
 
-.text-neon {
-    color: var(--primary-neon);
-    text-shadow: 0 0 10px var(--primary-neon);
+/* Ensure messages are above background */
+.messages-container {
+    position: relative;
+    z-index: 1;
 }
 
-.bg-glass {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
+/* ==============================
+   TEMA AMICO (Arancione/Caldo)
+   ============================== */
+
+#chat-section.theme-amico::before {
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(243, 156, 18, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 80% 20%, rgba(230, 126, 34, 0.06) 0%, transparent 45%);
+    opacity: 1;
+    animation: amicoFloat 12s ease-in-out infinite;
 }
 
-/* ================================
-   ACCESSIBILITY
-   ================================ */
+#chat-section.theme-amico::after {
+    background: 
+        linear-gradient(45deg, transparent 0%, rgba(243, 156, 18, 0.03) 25%, transparent 50%),
+        linear-gradient(-45deg, transparent 0%, rgba(230, 126, 34, 0.02) 30%, transparent 60%);
+    opacity: 1;
+    animation: amicoWaves 15s linear infinite;
+}
 
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
+@keyframes amicoFloat {
+    0%, 100% { 
+        transform: translateY(0px) rotate(0deg);
+        opacity: 1;
+    }
+    33% { 
+        transform: translateY(-8px) rotate(0.5deg);
+        opacity: 0.8;
+    }
+    66% { 
+        transform: translateY(4px) rotate(-0.3deg);
+        opacity: 0.9;
     }
 }
 
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
+@keyframes amicoWaves {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100vw) rotate(45deg); }
 }
 
-/* Focus styles for keyboard navigation */
-.btn-futuristic:focus,
-.input-futuristic:focus,
-.mode-tag:focus {
-    outline: 2px solid var(--primary-neon);
-    outline-offset: 2px;
+/* ==============================
+   TEMA MUSICA (Rosso/Energico)
+   ============================== */
+
+#chat-section.theme-musica::before {
+    background: 
+        radial-gradient(circle at 30% 70%, rgba(231, 76, 60, 0.08) 0%, transparent 35%),
+        radial-gradient(circle at 70% 30%, rgba(192, 57, 43, 0.06) 0%, transparent 40%);
+    opacity: 1;
+    animation: musicaPulse 8s ease-in-out infinite;
+}
+
+#chat-section.theme-musica::after {
+    background: 
+        repeating-linear-gradient(
+            90deg,
+            transparent 0px,
+            rgba(231, 76, 60, 0.02) 2px,
+            transparent 4px,
+            transparent 20px
+        );
+    opacity: 1;
+    animation: musicaRhythm 10s ease-in-out infinite;
+}
+
+@keyframes musicaPulse {
+    0%, 100% { 
+        transform: scale(1);
+        opacity: 1;
+    }
+    25% { 
+        transform: scale(1.02);
+        opacity: 0.8;
+    }
+    50% { 
+        transform: scale(0.98);
+        opacity: 0.9;
+    }
+    75% { 
+        transform: scale(1.01);
+        opacity: 0.85;
+    }
+}
+
+@keyframes musicaRhythm {
+    0%, 100% { 
+        transform: translateY(0px);
+        opacity: 1;
+    }
+    50% { 
+        transform: translateY(-3px);
+        opacity: 0.7;
+    }
+}
+
+/* ==============================
+   TEMA PROGRAMMATORE (Verde/Tech)
+   ============================== */
+
+#chat-section.theme-programmatore::before {
+    background: 
+        radial-gradient(circle at 25% 75%, rgba(46, 204, 113, 0.08) 0%, transparent 38%),
+        radial-gradient(circle at 75% 25%, rgba(39, 174, 96, 0.06) 0%, transparent 42%);
+    opacity: 1;
+    animation: programmatoreMatrix 14s linear infinite;
+}
+
+#chat-section.theme-programmatore::after {
+    background: 
+        linear-gradient(0deg, 
+            transparent 0%,
+            rgba(46, 204, 113, 0.02) 20%,
+            transparent 40%,
+            rgba(39, 174, 96, 0.015) 60%,
+            transparent 80%,
+            rgba(46, 204, 113, 0.01) 100%
+        );
+    opacity: 1;
+    animation: programmatoreCode 20s linear infinite;
+}
+
+@keyframes programmatoreMatrix {
+    0%, 100% { 
+        transform: skewX(0deg) translateY(0px);
+        opacity: 1;
+    }
+    25% { 
+        transform: skewX(0.5deg) translateY(-5px);
+        opacity: 0.8;
+    }
+    50% { 
+        transform: skewX(-0.3deg) translateY(2px);
+        opacity: 0.9;
+    }
+    75% { 
+        transform: skewX(0.2deg) translateY(-3px);
+        opacity: 0.85;
+    }
+}
+
+@keyframes programmatoreCode {
+    0% { 
+        transform: translateY(100vh);
+        opacity: 0.5;
+    }
+    50% { 
+        opacity: 1;
+    }
+    100% { 
+        transform: translateY(-100vh);
+        opacity: 0.5;
+    }
+}
+
+/* ==============================
+   TEMA RICERCATORE (Blu/Analitico)
+   ============================== */
+
+#chat-section.theme-ricercatore::before {
+    background: 
+        radial-gradient(circle at 40% 60%, rgba(52, 152, 219, 0.08) 0%, transparent 36%),
+        radial-gradient(circle at 60% 40%, rgba(41, 128, 185, 0.06) 0%, transparent 40%);
+    opacity: 1;
+    animation: ricercatoreFlow 16s ease-in-out infinite;
+}
+
+#chat-section.theme-ricercatore::after {
+    background: 
+        conic-gradient(from 0deg at 50% 50%, 
+            transparent 0deg,
+            rgba(52, 152, 219, 0.015) 90deg,
+            transparent 180deg,
+            rgba(41, 128, 185, 0.02) 270deg,
+            transparent 360deg
+        );
+    opacity: 1;
+    animation: ricercatoreSearch 25s linear infinite;
+}
+
+@keyframes ricercatoreFlow {
+    0%, 100% { 
+        transform: rotate(0deg) scale(1);
+        opacity: 1;
+    }
+    25% { 
+        transform: rotate(0.5deg) scale(1.01);
+        opacity: 0.8;
+    }
+    50% { 
+        transform: rotate(-0.3deg) scale(0.99);
+        opacity: 0.9;
+    }
+    75% { 
+        transform: rotate(0.4deg) scale(1.005);
+        opacity: 0.85;
+    }
+}
+
+@keyframes ricercatoreSearch {
+    0% { 
+        transform: rotate(0deg);
+        opacity: 0.7;
+    }
+    25% { 
+        transform: rotate(90deg);
+        opacity: 1;
+    }
+    50% { 
+        transform: rotate(180deg);
+        opacity: 0.8;
+    }
+    75% { 
+        transform: rotate(270deg);
+        opacity: 0.9;
+    }
+    100% { 
+        transform: rotate(360deg);
+        opacity: 0.7;
+    }
+}
+
+/* ==============================
+   RESPONSIVE E PERFORMANCE
+   ============================== */
+
+/* Riduzione effetti su dispositivi mobili */
+@media (max-width: 768px) {
+    #chat-section::before,
+    #chat-section::after {
+        opacity: 0.5 !important;
+    }
+}
+
+/* Rispetto preferenze accessibilità */
+@media (prefers-reduced-motion: reduce) {
+    #chat-section::before,
+    #chat-section::after {
+        animation: none !important;
+    }
+}
+
+/* ==============================
+   MIGLIORIE INTEGRAZIONE MESSAGGI
+   ============================== */
+
+/* Migliora contrasto messaggi sui temi */
+#chat-section.theme-amico .message-bubble {
+    box-shadow: 0 2px 10px rgba(243, 156, 18, 0.05);
+}
+
+#chat-section.theme-musica .message-bubble {
+    box-shadow: 0 2px 10px rgba(231, 76, 60, 0.05);
+}
+
+#chat-section.theme-programmatore .message-bubble {
+    box-shadow: 0 2px 10px rgba(46, 204, 113, 0.05);
+}
+
+#chat-section.theme-ricercatore .message-bubble {
+    box-shadow: 0 2px 10px rgba(52, 152, 219, 0.05);
+}
+
+/* Avatar colorati per temi */
+#chat-section.theme-amico .message-avatar {
+    background: linear-gradient(135deg, var(--theme-amico-primary), var(--theme-amico-secondary)) !important;
+    box-shadow: 0 0 10px rgba(243, 156, 18, 0.2);
+}
+
+#chat-section.theme-musica .message-avatar {
+    background: linear-gradient(135deg, var(--theme-musica-primary), var(--theme-musica-secondary)) !important;
+    box-shadow: 0 0 10px rgba(231, 76, 60, 0.2);
+}
+
+#chat-section.theme-programmatore .message-avatar {
+    background: linear-gradient(135deg, var(--theme-programmatore-primary), var(--theme-programmatore-secondary)) !important;
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.2);
+}
+
+#chat-section.theme-ricercatore .message-avatar {
+    background: linear-gradient(135deg, var(--theme-ricercatore-primary), var(--theme-ricercatore-secondary)) !important;
+    box-shadow: 0 0 10px rgba(52, 152, 219, 0.2);
 }
